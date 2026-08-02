@@ -1,0 +1,95 @@
+/* ============================================
+   TRANSEC Taxonomy — Design System
+   Ported from rf-spectrum-viewer/style.css so the two tools
+   read as siblings; extended with maturity + objective colors.
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-deep: #07070f;
+  --bg-card: rgba(15, 15, 30, 0.72);
+  --bg-card-hover: rgba(20, 20, 40, 0.85);
+  --border-subtle: rgba(99, 102, 241, 0.12);
+  --border-accent: rgba(99, 102, 241, 0.3);
+  --border-bright: #6366f1;
+  --text-primary: #e0e0f0;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --text-label: #4b5563;
+  --accent-indigo: #6366f1;
+  --accent-cyan: #06b6d4;
+  --accent-pink: #f43f5e;
+  --accent-green: #10b981;
+  --accent-amber: #f59e0b;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.15);
+  --transition-fast: 0.15s ease;
+  --transition-med: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* — Taxonomy extensions — */
+  /* Maturity fills (slide-4 palette, tuned for dark bg where noted) */
+  --maturity-n: #0e7c86;
+  --maturity-e: #27327f;
+  --maturity-r: #d97706;
+  --maturity-w: #2a2c36;          /* slide uses light gray; dark-theme equivalent */
+  --maturity-w-text: #6b7280;
+  /* Objective accents (from the deck) */
+  --obj-lpd: #0e7c86;
+  --obj-lpi: #2e7d32;
+  --obj-lpe: #5b3fa8;
+  --obj-aj:  #c0392b;
+  --obj-tfs: #b8860b;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ——— Ambient background glows (ported pattern) ——— */
+.bg-glow {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.14;
+  pointer-events: none;
+  z-index: 0;
+}
+.bg-glow-1 { width: 500px; height: 500px; background: var(--accent-indigo); top: -150px; left: -100px; }
+.bg-glow-2 { width: 400px; height: 400px; background: var(--accent-cyan); bottom: -120px; right: -80px; }
+.bg-glow-3 { width: 300px; height: 300px; background: var(--accent-pink); top: 40%; left: 60%; opacity: 0.07; }
+
+/* ——— Screen show/hide (ported pattern) ——— */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  transition: opacity var(--transition-slow), transform var(--transition-slow);
+}
+.screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -4,6 +4,15 @@
   height: 100%;
   overflow: auto;
   padding: 28px 32px 40px;
+  text-align: center; /* centers .matrix-inner; text realigned inside */
+}
+
+/* Sizes to its widest child (the table) so the block centers without the
+   fixed-width cells stretching on ultrawide displays. */
+.matrix-inner {
+  display: inline-block;
+  text-align: left;
+  max-width: 100%;
 }
 
 .matrix-intro {

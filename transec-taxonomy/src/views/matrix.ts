@@ -82,14 +82,18 @@ export function mountMatrix(container: HTMLElement, variant: 'matrix' | 'frontie
          </aside>`
       : '';
 
+  // .matrix-inner shrink-wraps to the table's width so the whole block can
+  // be centered on wide screens without stretching the fixed-density grid.
   wrap.innerHTML = `
-    <div class="matrix-intro">${intro}</div>
-    <table class="matrix-table ${variant === 'frontier' ? 'frontier' : ''}" aria-label="TRANSEC maturity matrix">
-      <thead><tr><th scope="col">Band</th>${headCells}</tr></thead>
-      <tbody>${bodyRows}</tbody>
-    </table>
-    <div class="matrix-legend">${legend}</div>
-    ${contribution}
+    <div class="matrix-inner">
+      <div class="matrix-intro">${intro}</div>
+      <table class="matrix-table ${variant === 'frontier' ? 'frontier' : ''}" aria-label="TRANSEC maturity matrix">
+        <thead><tr><th scope="col">Band</th>${headCells}</tr></thead>
+        <tbody>${bodyRows}</tbody>
+      </table>
+      <div class="matrix-legend">${legend}</div>
+      ${contribution}
+    </div>
   `;
   container.appendChild(wrap);
 

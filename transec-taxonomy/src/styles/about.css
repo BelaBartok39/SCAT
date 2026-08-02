@@ -7,7 +7,9 @@
 }
 
 .about-doc {
+  /* Prose: capped for readable line length, centered rather than stretched. */
   max-width: 760px;
+  margin: 0 auto;
   font-size: 14px;
   line-height: 1.72;
   color: var(--text-secondary);
@@ -122,6 +124,9 @@
   align-items: center;
   gap: 10px;
   white-space: nowrap;
+  /* Keeps the one-line look of the real strip; scrolls inside itself on
+     narrow screens rather than widening the page. */
+  overflow-x: auto;
   font-family: var(--font-mono);
   font-size: 8.5px;
   letter-spacing: 0.045em;

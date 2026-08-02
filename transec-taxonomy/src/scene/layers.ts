@@ -6,12 +6,14 @@
 
 import * as THREE from 'three';
 
+// Compressed vertical stack: real orbits are unrenderable anyway, and a
+// tighter diorama keeps ground props and satellites in one readable frame.
 export const LAYER_HEIGHTS = {
   personal: 8,
   local: 18,
   cellular: 46,
-  leo: 230,
-  geo: 345,
+  leo: 150,
+  geo: 235,
 } as const;
 
 export function buildLayers(scene: THREE.Scene): { leoDots: THREE.Points } {
@@ -55,9 +57,9 @@ export function buildLayers(scene: THREE.Scene): { leoDots: THREE.Points } {
   const leoPos = new Float32Array(leoCount * 3);
   for (let i = 0; i < leoCount; i++) {
     const a = Math.random() * Math.PI * 2;
-    const r = 360 + Math.random() * 190;
+    const r = 320 + Math.random() * 180;
     leoPos[i * 3] = Math.cos(a) * r;
-    leoPos[i * 3 + 1] = LAYER_HEIGHTS.leo + (Math.random() - 0.5) * 36;
+    leoPos[i * 3 + 1] = LAYER_HEIGHTS.leo + (Math.random() - 0.5) * 28;
     leoPos[i * 3 + 2] = Math.sin(a) * r;
   }
   const leoGeo = new THREE.BufferGeometry();
@@ -70,7 +72,7 @@ export function buildLayers(scene: THREE.Scene): { leoDots: THREE.Points } {
 
   // — GEO arc: a thin ring far overhead —
   const geoRing = new THREE.Mesh(
-    new THREE.TorusGeometry(430, 0.9, 8, 128),
+    new THREE.TorusGeometry(390, 0.9, 8, 128),
     new THREE.MeshBasicMaterial({ color: 0x6b5aa8, transparent: true, opacity: 0.5 }),
   );
   geoRing.rotation.x = Math.PI / 2;

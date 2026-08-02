@@ -28,7 +28,7 @@ const POSITIONS: Record<BandId, [number, number, number]> = {
   wifi: [-30, LAYER_HEIGHTS.local, 130],
   'cellular-3g-4g': [90, LAYER_HEIGHTS.cellular, 110],
   'cellular-5g': [200, LAYER_HEIGHTS.cellular, 150],
-  '6g-subthz': [300, LAYER_HEIGHTS.cellular - 6, 70],
+  '6g-subthz': [268, LAYER_HEIGHTS.cellular - 6, 60],
   'satcom-civil': [-130, LAYER_HEIGHTS.geo, -150],
   'satcom-military': [150, LAYER_HEIGHTS.geo, -120],
 };
@@ -115,8 +115,8 @@ export function buildEmitters(scene: THREE.Scene): EmitterHandle[] {
 
     // Core: satellites get boxes with panels, terrestrial get icosahedra.
     const coreGeo = isOrbital
-      ? new THREE.BoxGeometry(8, 8, 8)
-      : new THREE.IcosahedronGeometry(6, 1);
+      ? new THREE.BoxGeometry(11, 11, 11)
+      : new THREE.IcosahedronGeometry(8, 1);
     const coreMat = new THREE.MeshStandardMaterial({
       color: BASE_COLOR.clone(),
       emissive: BASE_COLOR.clone(),
@@ -136,8 +136,8 @@ export function buildEmitters(scene: THREE.Scene): EmitterHandle[] {
         roughness: 0.6,
       });
       for (const side of [-1, 1]) {
-        const panel = new THREE.Mesh(new THREE.BoxGeometry(14, 0.8, 7), panelMat);
-        panel.position.x = side * 12;
+        const panel = new THREE.Mesh(new THREE.BoxGeometry(18, 0.9, 9), panelMat);
+        panel.position.x = side * 16;
         group.add(panel);
       }
     } else {

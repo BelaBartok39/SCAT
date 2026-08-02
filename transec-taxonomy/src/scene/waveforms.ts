@@ -25,7 +25,7 @@ export interface Waveform {
 
 /** Gradient texture used by beams/falloff cones (built once, shared). */
 let beamTex: THREE.Texture | null = null;
-function getBeamTexture(): THREE.Texture {
+export function getBeamTexture(): THREE.Texture {
   if (beamTex) return beamTex;
   const cv = document.createElement('canvas');
   cv.width = 1;

@@ -12,6 +12,8 @@ import type { EmitterHandle } from './emitters';
 import { CameraDirector } from './camera';
 import { Lens } from './lens';
 import { Warden } from './warden';
+import { Props } from './props';
+import { ServingBeams } from './beams';
 import { getState, setState, subscribeKeys } from '../store';
 import type { BandId } from '../data/types';
 
@@ -40,10 +42,10 @@ export class SceneRoot {
     container.appendChild(this.renderer.domElement);
 
     this.camera = new THREE.PerspectiveCamera(50, 1, 1, 4000);
-    this.camera.position.set(-40, 190, 560);
+    this.camera.position.set(30, 215, 600);
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    this.controls.target.set(0, 110, 0);
+    this.controls.target.set(30, 78, 20);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.06;
     this.controls.minDistance = 80;
@@ -63,6 +65,18 @@ export class SceneRoot {
     buildLayers(this.scene);
     this.emitters = buildEmitters(this.scene);
     this.director = new CameraDirector(this.camera, this.controls, () => getState().reducedMotion);
+
+    const emitterPos = (id: string) =>
+      this.emitters.find((e) => e.band.id === id)!.group.position;
+    const props = new Props(this.scene, (id) => emitterPos(id));
+    this.addUpdater((dt, elapsed) => {
+      if (!getState().reducedMotion) props.update(dt, elapsed);
+    });
+
+    const beams = new ServingBeams(this.scene, this.emitters);
+    this.addUpdater((dt, elapsed) => {
+      if (!getState().reducedMotion) beams.update(dt, elapsed);
+    });
 
     const lens = new Lens(this.emitters);
     this.addUpdater((dt, elapsed) => lens.update(dt, elapsed));

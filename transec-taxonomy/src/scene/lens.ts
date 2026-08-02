@@ -84,7 +84,7 @@ export class Lens {
         handle.setTint(BASE_COLOR, 0.5);
         handle.setDimmed(false);
         slot.active = createWaveform('omniRings', BASE_COLOR.clone().multiplyScalar(0.8));
-        slot.targetFade = 0.35;
+        slot.targetFade = 0.22; // subtle ambience — props and links carry the story now
         slot.fade = 0;
         handle.group.add(slot.active.group);
         continue;

@@ -21,11 +21,11 @@ export function mountMatrix(container: HTMLElement, variant: 'matrix' | 'frontie
 
   const intro =
     variant === 'matrix'
-      ? `<h2>The mapping</h2>
+      ? `<h2>The Mapping</h2>
          <p>Physical-layer TRANSEC maturity by band and objective. Each cell asks: for this band,
          how is this objective achieved — and how mature is it? Click any cell for the full story.
          Upper-layer cryptography (COMSEC) is out of scope, so civil systems that rely on it read as weak here.</p>`
-      : `<h2>The frontier</h2>
+      : `<h2>The Frontier</h2>
          <p>Only the gaps and the research edge: <strong>Weak/absent</strong> and <strong>Research</strong> cells.
          TFS at the physical layer is the emptiest column — the clearest opening for new work,
          including PHY-layer dual-messaging and decoy-channel schemes.</p>`;

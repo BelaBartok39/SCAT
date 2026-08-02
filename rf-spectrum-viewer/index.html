@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Upload raw RF capture files and visualize them as interactive 3D spectrum waterfalls. Supports HackRF sweep, raw IQ, SigMF, and CSV formats.">
+  <title>RF Spectrum 3D Viewer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Ambient background glows -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-glow bg-glow-3"></div>
+
+  <!-- ============================================
+       UPLOAD SCREEN
+       ============================================ -->
+  <div id="upload-screen" class="screen visible">
+    <div class="upload-container">
+      <h1 class="upload-title">📡 RF Spectrum 3D Viewer</h1>
+      <p class="upload-subtitle">Upload a radio frequency capture file to generate an interactive 3D waterfall visualization</p>
+
+      <!-- Drop zone -->
+      <div class="drop-zone" id="drop-zone">
+        <span class="drop-icon">📂</span>
+        <div class="drop-text">
+          Drag &amp; drop your RF capture here, or <span class="drop-text-accent">browse files</span>
+        </div>
+        <div class="drop-hint">.csv · .raw · .cs8 · .cu8 · .cs16 · .cf32 · .sigmf</div>
+        <input type="file" class="file-input" id="file-input" multiple accept=".csv,.raw,.cs8,.complex16s,.cu8,.cs16,.sc16,.cf32,.fc32,.sigmf-data,.sigmf-meta">
+      </div>
+
+      <!-- File info -->
+      <div class="file-info" id="file-info">
+        <div class="file-info-name" id="file-name"></div>
+        <div class="file-info-detail" id="file-detail"></div>
+      </div>
+
+      <!-- IQ params panel -->
+      <div class="params-panel" id="params-panel">
+        <div class="params-title">IQ Capture Parameters</div>
+        <div class="params-grid">
+          <div class="param-group">
+            <label class="param-label" for="param-sr">Sample Rate (Hz)</label>
+            <input type="number" class="param-input" id="param-sr" value="20000000" placeholder="e.g. 20000000">
+          </div>
+          <div class="param-group">
+            <label class="param-label" for="param-cf">Center Freq (Hz)</label>
+            <input type="number" class="param-input" id="param-cf" value="2450000000" placeholder="e.g. 2450000000">
+          </div>
+          <div class="param-group">
+            <label class="param-label" for="param-fft">FFT Size</label>
+            <select class="param-select" id="param-fft">
+              <option value="512">512</option>
+              <option value="1024" selected>1024</option>
+              <option value="2048">2048</option>
+              <option value="4096">4096</option>
+              <option value="8192">8192</option>
+            </select>
+          </div>
+          <button class="process-btn" id="process-btn">▶ Process &amp; Visualize</button>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-container" id="progress-container">
+        <div class="progress-label">
+          <span id="progress-text">Processing...</span>
+          <span id="progress-pct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div class="error-msg" id="error-msg"></div>
+
+      <!-- Format badges -->
+      <div class="format-badges">
+        <span class="format-badge">HackRF Sweep CSV</span>
+        <span class="format-badge">Raw IQ (int8)</span>
+        <span class="format-badge">RTL-SDR (uint8)</span>
+        <span class="format-badge">IQ int16</span>
+        <span class="format-badge">IQ float32</span>
+        <span class="format-badge">SigMF</span>
+        <span class="format-badge">Generic CSV</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       VISUALIZATION SCREEN
+       ============================================ -->
+  <div id="viz-screen" class="screen hidden">
+
+    <!-- Header -->
+    <div class="viz-header">
+      <div class="viz-title-group">
+        <button class="back-btn" id="back-btn">← Back</button>
+        <div>
+          <div class="viz-title" id="viz-title">📡 RF Spectrum Analysis</div>
+          <div class="viz-sub" id="viz-sub">LOADED FILE</div>
+        </div>
+      </div>
+      <div class="viz-stats">
+        <div class="stat-card">
+          <div class="stat-label">Peak Signal</div>
+          <div class="stat-val peak" id="stat-peak-freq">—</div>
+          <div class="stat-detail" id="stat-peak-detail">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Noise Floor</div>
+          <div class="stat-val cool" id="stat-noise">—</div>
+          <div class="stat-detail">Estimated ambient</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Data Points</div>
+          <div class="stat-val cool" id="stat-points">—</div>
+          <div class="stat-detail" id="stat-dims">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas -->
+    <div class="viz-canvas-wrap">
+      <div class="scanline"></div>
+      <canvas id="viz-canvas"></canvas>
+      <div class="tooltip" id="tooltip">
+        <div class="tt-freq" id="tt-freq"></div>
+        <div class="tt-power" id="tt-power"></div>
+        <div class="tt-band" id="tt-band"></div>
+      </div>
+    </div>
+
+    <!-- Time window slider (shown for large datasets) -->
+    <div class="time-slider-wrap" id="time-slider-wrap">
+      <div class="time-slider-label">
+        <span class="time-slider-icon">⏱</span>
+        <span>TIME WINDOW</span>
+        <span class="time-slider-range" id="slider-range-label">Showing all</span>
+      </div>
+      <div class="time-slider-track-wrap">
+        <input type="range" class="time-slider" id="time-slider" min="0" max="100" value="0">
+        <div class="time-slider-fill" id="time-slider-fill"></div>
+      </div>
+      <div class="time-slider-info">
+        <span id="slider-window-size">Window: 60 slices</span>
+        <span id="slider-position">0 / 0</span>
+      </div>
+    </div>
+
+    <!-- Bottom controls -->
+    <div class="viz-bottom">
+      <div class="legend-box">
+        <div class="legend-title">Signal Power</div>
+        <div class="gradient-bar"></div>
+        <div class="gradient-labels">
+          <span id="legend-min">—</span>
+          <span id="legend-mid">—</span>
+          <span id="legend-max">—</span>
+        </div>
+      </div>
+      <div class="viz-controls">
+        <button class="ctrl-btn on" id="btn-mode" onclick="window.App.cycleMode()">Surface</button>
+        <button class="ctrl-btn on" id="btn-rotate" onclick="window.App.toggleRotate()">Auto Rotate</button>
+        <button class="ctrl-btn" id="btn-timescroll" onclick="window.App.toggleTimeScroll()">Auto Time</button>
+        <button class="ctrl-btn on" id="btn-grid" onclick="window.App.toggleGrid()">Grid</button>
+        <button class="ctrl-btn on" id="btn-labels" onclick="window.App.toggleLabels()">Labels</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts — order matters: fft first, then parsers (uses FFT), then renderer, then app -->
+  <script src="js/fft.js"></script>
+  <script src="js/parsers.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

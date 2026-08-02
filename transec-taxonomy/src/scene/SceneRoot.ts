@@ -10,6 +10,7 @@ import { buildLayers } from './layers';
 import { buildEmitters } from './emitters';
 import type { EmitterHandle } from './emitters';
 import { CameraDirector } from './camera';
+import { Lens } from './lens';
 import { getState, setState, subscribeKeys } from '../store';
 import type { BandId } from '../data/types';
 
@@ -61,6 +62,13 @@ export class SceneRoot {
     buildLayers(this.scene);
     this.emitters = buildEmitters(this.scene);
     this.director = new CameraDirector(this.camera, this.controls, () => getState().reducedMotion);
+
+    const lens = new Lens(this.emitters);
+    this.addUpdater((dt, elapsed) => lens.update(dt, elapsed));
+    // Lens changes must repaint even when the loop is paused (reduced motion).
+    subscribeKeys(['lens'], () => {
+      if (!this.running) this.renderFrame(1 / 60, this.clock.elapsedTime);
+    });
 
     // — Picking —
     const dom = this.renderer.domElement;

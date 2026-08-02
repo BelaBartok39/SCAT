@@ -16,7 +16,7 @@ import type { AppState } from './store';
 import type { BandId, ObjectiveId } from './data/types';
 import { BAND_ORDER, OBJECTIVE_ORDER } from './data/types';
 
-const VIEWS = ['scene', 'matrix', 'frontier'] as const;
+const VIEWS = ['scene', 'matrix', 'frontier', 'about'] as const;
 
 function isBand(s: string): s is BandId {
   return (BAND_ORDER as string[]).includes(s);

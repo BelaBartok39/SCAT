@@ -12,6 +12,7 @@ import './styles/scene.css';
 import './styles/ribbon.css';
 import './styles/lab.css';
 import './styles/warden.css';
+import './styles/about.css';
 
 import { subscribeKeys, getState } from './store';
 import { initRouter } from './router';
@@ -20,6 +21,7 @@ import { mountMatrix } from './views/matrix';
 import { mountModal } from './views/modal';
 import { mountScene } from './views/scene';
 import { mountLab } from './views/lab';
+import { mountAbout } from './views/about';
 
 const app = document.getElementById('app')!;
 
@@ -41,6 +43,7 @@ const containers = {
   scene: document.createElement('div'),
   matrix: document.createElement('div'),
   frontier: document.createElement('div'),
+  about: document.createElement('div'),
 } as const;
 
 for (const [id, el] of Object.entries(containers)) {
@@ -59,6 +62,7 @@ subscribeKeys(['view'], syncViews);
 
 mountMatrix(containers.matrix, 'matrix');
 mountMatrix(containers.frontier, 'frontier');
+mountAbout(containers.about);
 mountModal();
 mountLab();
 mountScene(containers.scene);

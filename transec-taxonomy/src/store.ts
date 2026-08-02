@@ -5,7 +5,7 @@
 
 import type { BandId, ObjectiveId } from './data/types';
 
-export type ViewId = 'scene' | 'matrix' | 'frontier';
+export type ViewId = 'scene' | 'matrix' | 'frontier' | 'about';
 
 export interface WardenPosition {
   x: number;          // scene-plane coords

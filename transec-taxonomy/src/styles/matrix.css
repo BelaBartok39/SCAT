@@ -107,3 +107,32 @@
   color: var(--text-secondary);
 }
 .matrix-legend .chip { width: 14px; height: 14px; border-radius: 4px; }
+
+/* Frontier positioning note: prior art vs. this taxonomy's contribution */
+.contribution-note {
+  max-width: 780px;
+  margin-top: 26px;
+  padding: 16px 18px;
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--accent-indigo);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background: rgba(15, 15, 30, 0.55);
+  font-size: 13px;
+  line-height: 1.68;
+  color: var(--text-secondary);
+}
+.contribution-note h3 {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+.contribution-note p { margin-bottom: 10px; }
+.contribution-note strong { color: var(--text-primary); }
+.contribution-note em { font-style: italic; }
+.contribution-note .cn-refs {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-label);
+  margin-bottom: 0;
+}

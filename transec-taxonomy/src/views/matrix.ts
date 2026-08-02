@@ -53,6 +53,35 @@ export function mountMatrix(container: HTMLElement, variant: 'matrix' | 'frontie
     )
     .join('');
 
+  // Frontier carries the positioning note: what is prior art, and what
+  // exactly this taxonomy contributes on top of it.
+  const contribution =
+    variant === 'frontier'
+      ? `<aside class="contribution-note">
+           <h3>What is new here — and what is not</h3>
+           <p>
+             <strong>Not new: the axes.</strong> Link direction is already structural in existing
+             space-security work — SPARTA splits eavesdropping into
+             <em>uplink intercept</em> and <em>downlink intercept</em> (REC-0005), Tedeschi et al.
+             carry a link column through their solution tables, and Ben Yahia et al. decompose the
+             link segment into uplink, downlink and inter-satellite links. Covert-communications
+             surveys own LPD; anti-jam surveys own AJ; satellite and terahertz surveys each own a
+             band region.
+           </p>
+           <p>
+             <strong>New: the crossing.</strong> No existing work crosses these objectives against
+             band and orbit regime at the physical layer. Prior taxonomies organize by attack
+             lifecycle or by defensive mechanism; this one asks, for every band, which of the five
+             TRANSEC objectives the physics of that band can even support — which is what exposes
+             the two-regime structure, the mid-band overlap, and the empty TFS column.
+           </p>
+           <p class="cn-refs">
+             Prior art: SPARTA REC-0005 · Tedeschi, Sciancalepore &amp; Di Pietro,
+             <em>Computer Networks</em> 216 (2022) · Ben Yahia et al., arXiv:2411.12632 (2024).
+           </p>
+         </aside>`
+      : '';
+
   wrap.innerHTML = `
     <div class="matrix-intro">${intro}</div>
     <table class="matrix-table ${variant === 'frontier' ? 'frontier' : ''}" aria-label="TRANSEC maturity matrix">
@@ -60,6 +89,7 @@ export function mountMatrix(container: HTMLElement, variant: 'matrix' | 'frontie
       <tbody>${bodyRows}</tbody>
     </table>
     <div class="matrix-legend">${legend}</div>
+    ${contribution}
   `;
   container.appendChild(wrap);
 

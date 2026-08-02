@@ -717,6 +717,8 @@ export const BANDS: Band[] = [
       'zhang2025',
       'koisser2024',
       'yue2023',
+      'sparta',
+      'benyahia2024',
       'itu-p676',
     ],
   },

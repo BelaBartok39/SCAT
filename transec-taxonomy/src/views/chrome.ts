@@ -21,6 +21,7 @@ const VIEW_META: { id: ViewId; label: string }[] = [
   { id: 'scene', label: 'Scene' },
   { id: 'matrix', label: 'Matrix' },
   { id: 'frontier', label: 'Frontier' },
+  { id: 'about', label: 'About' },
 ];
 
 export function mountChrome(root: HTMLElement): void {
@@ -55,11 +56,16 @@ export function mountChrome(root: HTMLElement): void {
     });
   });
 
+  const lensBar = header.querySelector<HTMLElement>('.lens-bar')!;
+
   const sync = () => {
     const s = getState();
     header.querySelectorAll<HTMLButtonElement>('.view-btn').forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.view === s.view);
     });
+    // The lens drives the scene and the matrix columns; on About it would
+    // be a control with nothing to control.
+    lensBar.style.visibility = s.view === 'about' ? 'hidden' : '';
     header.querySelectorAll<HTMLButtonElement>('.lens-btn').forEach((btn) => {
       const active = btn.dataset.lens === s.lens;
       btn.classList.toggle('active', active);

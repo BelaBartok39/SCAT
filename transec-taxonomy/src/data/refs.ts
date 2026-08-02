@@ -119,6 +119,25 @@ export const REFERENCES: Reference[] = [
     tags: ['band-context'],
   },
   {
+    id: 'sparta',
+    authors: 'The Aerospace Corporation',
+    title:
+      'SPARTA: Space Attack Research & Tactic Analysis — REC-0005 Eavesdropping (Uplink / Downlink Intercept)',
+    venue: 'Aerospace Corporation threat matrix',
+    year: 2024,
+    url: 'https://sparta.aerospace.org/technique/REC-0005/',
+    tags: ['band-context', 'lpi'],
+  },
+  {
+    id: 'benyahia2024',
+    authors: 'S. Ben Yahia et al.',
+    title: 'Securing Satellite Link Segment: A Secure-by-Component Design',
+    venue: 'arXiv preprint',
+    year: 2024,
+    url: 'https://arxiv.org/abs/2411.12632',
+    tags: ['band-context'],
+  },
+  {
     id: 'pavur2020',
     authors: 'J. Pavur, D. Moser, M. Strohmeier, V. Lenders, I. Martinovic',
     title: 'A Tale of Sea and Sky: On the Security of Maritime VSAT Communications',

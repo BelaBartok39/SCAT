@@ -8,6 +8,7 @@ import { SceneRoot } from '../scene/SceneRoot';
 import { BANDS } from '../data/bands';
 import type { BandId } from '../data/types';
 import { getState, setState, subscribeKeys } from '../store';
+import { mountRibbon } from './ribbon';
 
 let root: SceneRoot | null = null;
 
@@ -37,6 +38,7 @@ export function mountScene(container: HTMLElement): void {
     if (!root && !failed && getState().view === 'scene') {
       try {
         root = new SceneRoot(container);
+        mountRibbon(container, (id) => root!.focusBand(id));
       } catch (err) {
         // WebGL unavailable — degrade gracefully; matrix view remains the
         // canonical representation and must never be taken down with us.

@@ -9,6 +9,7 @@ import './styles/app.css';
 import './styles/matrix.css';
 import './styles/modal.css';
 import './styles/scene.css';
+import './styles/ribbon.css';
 
 import { subscribeKeys, getState } from './store';
 import { initRouter } from './router';

@@ -12,9 +12,57 @@ export const LAYER_HEIGHTS = {
   personal: 8,
   local: 18,
   cellular: 46,
-  leo: 150,
-  geo: 235,
+  leo: 130,
+  geo: 268,
 } as const;
+
+/** Small caption sprite for orbit-layer labels (mono, dimmer than emitter labels). */
+function makeLayerCaption(text: string): THREE.Sprite {
+  const scale = 4;
+  const canvas = document.createElement('canvas');
+  const probe = canvas.getContext('2d')!;
+  probe.font = '600 12px "JetBrains Mono", monospace';
+  const w = Math.ceil(probe.measureText(text).width) + 22;
+  const h = 28;
+  canvas.width = w * scale;
+  canvas.height = h * scale;
+  const ctx = canvas.getContext('2d')!;
+  ctx.scale(scale, scale);
+  ctx.fillStyle = 'rgba(12, 12, 26, 0.65)';
+  ctx.beginPath();
+  ctx.roundRect(2, 2, w - 4, h - 4, 7);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(139, 163, 255, 0.28)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = '#8fa3ff';
+  ctx.font = '600 12px "JetBrains Mono", monospace';
+  ctx.fillText(text, 11, 19);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const sprite = new THREE.Sprite(
+    new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0.9 }),
+  );
+  const worldH = 13;
+  sprite.scale.set((w / h) * worldH, worldH, 1);
+  return sprite;
+}
+
+/** Soft round dot texture so LEO points read as lights, not squares. */
+function makeDotTexture(): THREE.Texture {
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 32;
+  const ctx = cv.getContext('2d')!;
+  const g = ctx.createRadialGradient(16, 16, 1, 16, 16, 16);
+  g.addColorStop(0, 'rgba(255,255,255,1)');
+  g.addColorStop(0.4, 'rgba(255,255,255,0.55)');
+  g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 32, 32);
+  const tex = new THREE.CanvasTexture(cv);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
 
 export function buildLayers(scene: THREE.Scene): { leoDots: THREE.Points } {
   // — Ground disc —
@@ -66,9 +114,27 @@ export function buildLayers(scene: THREE.Scene): { leoDots: THREE.Points } {
   leoGeo.setAttribute('position', new THREE.BufferAttribute(leoPos, 3));
   const leoDots = new THREE.Points(
     leoGeo,
-    new THREE.PointsMaterial({ color: 0x8fa3ff, size: 2.6, sizeAttenuation: true, transparent: true, opacity: 0.75 }),
+    new THREE.PointsMaterial({
+      color: 0x8fa3ff,
+      size: 4.2,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0.8,
+      map: makeDotTexture(),
+      alphaTest: 0.02,
+      depthWrite: false,
+    }),
   );
   scene.add(leoDots);
+
+  // — A faint ring at LEO height so the shell reads as a layer, not stray dots —
+  const leoRing = new THREE.Mesh(
+    new THREE.TorusGeometry(410, 0.6, 8, 128),
+    new THREE.MeshBasicMaterial({ color: 0x8fa3ff, transparent: true, opacity: 0.22 }),
+  );
+  leoRing.rotation.x = Math.PI / 2;
+  leoRing.position.y = LAYER_HEIGHTS.leo;
+  scene.add(leoRing);
 
   // — GEO arc: a thin ring far overhead —
   const geoRing = new THREE.Mesh(
@@ -78,6 +144,16 @@ export function buildLayers(scene: THREE.Scene): { leoDots: THREE.Points } {
   geoRing.rotation.x = Math.PI / 2;
   geoRing.position.y = LAYER_HEIGHTS.geo;
   scene.add(geoRing);
+
+  // — Layer captions (billboarded), echoing the infographic's edge labels —
+  // Captions sit on the FAR arc of each ring — that's the part the default
+  // camera actually sees (the near side passes behind the viewer).
+  const geoCap = makeLayerCaption('GEO · 35,786 km · fixed overhead');
+  geoCap.position.set(-345, LAYER_HEIGHTS.geo + 16, -180);
+  scene.add(geoCap);
+  const leoCap = makeLayerCaption('LEO shell · 160–2,000 km · constellations');
+  leoCap.position.set(-300, LAYER_HEIGHTS.leo + 16, -275);
+  scene.add(leoCap);
 
   // — Soft key light + ambient so emitter materials read —
   scene.add(new THREE.AmbientLight(0x8888aa, 0.9));

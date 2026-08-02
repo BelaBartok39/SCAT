@@ -62,7 +62,11 @@ export class SceneRoot {
 
     this.scene.fog = new THREE.FogExp2(0x07070f, 0.00062);
 
-    buildLayers(this.scene);
+    const { leoDots } = buildLayers(this.scene);
+    // LEO drifts while GEO hangs still — the orbit trade, shown not told.
+    this.addUpdater((dt) => {
+      if (!getState().reducedMotion) leoDots.rotation.y += dt * 0.045;
+    });
     this.emitters = buildEmitters(this.scene);
     this.director = new CameraDirector(this.camera, this.controls, () => getState().reducedMotion);
 

@@ -10,10 +10,12 @@ import { buildLayers } from './layers';
 import { buildEmitters } from './emitters';
 import type { EmitterHandle } from './emitters';
 import { CameraDirector } from './camera';
-import { Lens } from './lens';
+import { Lens, MATURITY_SCENE_COLOR } from './lens';
 import { Warden } from './warden';
 import { Props } from './props';
 import { ServingBeams } from './beams';
+import { CELLS } from '../data/matrix';
+import { cellFor } from '../data/types';
 import { getState, setState, subscribeKeys } from '../store';
 import type { BandId } from '../data/types';
 
@@ -62,12 +64,41 @@ export class SceneRoot {
 
     this.scene.fog = new THREE.FogExp2(0x07070f, 0.00062);
 
-    const { leoDots } = buildLayers(this.scene);
-    // LEO drifts while GEO hangs still — the orbit trade, shown not told.
+    const { leoDots, leoRing, gnss } = buildLayers(this.scene);
+    // LEO drifts fast, GNSS crawls, GEO hangs still — the orbit trade in motion.
     this.addUpdater((dt) => {
-      if (!getState().reducedMotion) leoDots.rotation.y += dt * 0.045;
+      if (getState().reducedMotion) return;
+      leoDots.rotation.y += dt * 0.045;
+      gnss.rotation.y += dt * 0.008;
     });
     this.emitters = buildEmitters(this.scene);
+
+    // The LEO shell IS the Starlink half of civil SATCOM: under a lens it
+    // takes that band's maturity color and dims when the cell is Weak, so
+    // the megaconstellation joins the band's story (and the TFS blackout).
+    // GNSS is scenery (no matrix row) and simply recedes under any lens.
+    const leoDotMat = leoDots.material as THREE.PointsMaterial;
+    const leoRingMat = leoRing.material as THREE.MeshBasicMaterial;
+    const syncOrbitLayers = () => {
+      const lensId = getState().lens;
+      gnss.visible = true;
+      gnss.traverse((o) => {
+        const m = (o as THREE.Mesh).material as THREE.Material | undefined;
+        if (m && 'opacity' in m) (m as THREE.Material & { opacity: number }).opacity = lensId ? 0.08 : (o instanceof THREE.Points ? 0.85 : 0.16);
+      });
+      if (!lensId) {
+        leoDotMat.color.set(0x8fa3ff);
+        leoDotMat.opacity = 0.8;
+        leoRingMat.opacity = 0.22;
+        return;
+      }
+      const cell = cellFor(CELLS, 'satcom-civil', lensId);
+      leoDotMat.color.set(MATURITY_SCENE_COLOR[cell.maturity]);
+      leoDotMat.opacity = cell.maturity === 'W' ? 0.12 : 0.8;
+      leoRingMat.opacity = cell.maturity === 'W' ? 0.05 : 0.25;
+    };
+    subscribeKeys(['lens'], syncOrbitLayers);
+    syncOrbitLayers();
     this.director = new CameraDirector(this.camera, this.controls, () => getState().reducedMotion);
 
     const emitterPos = (id: string) =>

@@ -20,7 +20,7 @@ import { RECEIVERS } from './props';
 import { getState, subscribeKeys } from '../store';
 
 /** Scene-tuned maturity palette (brighter than the matrix fills, for glow). */
-const MATURITY_SCENE_COLOR: Record<Maturity, number> = {
+export const MATURITY_SCENE_COLOR: Record<Maturity, number> = {
   N: 0x14b8a6,
   E: 0x6366f1,
   R: 0xf59e0b,

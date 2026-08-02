@@ -13,6 +13,7 @@ export const LAYER_HEIGHTS = {
   local: 18,
   cellular: 46,
   leo: 130,
+  meo: 196,
   geo: 268,
 } as const;
 
@@ -64,7 +65,14 @@ function makeDotTexture(): THREE.Texture {
   return tex;
 }
 
-export function buildLayers(scene: THREE.Scene): { leoDots: THREE.Points } {
+export interface LayerHandles {
+  leoDots: THREE.Points;
+  leoRing: THREE.Mesh;
+  /** GNSS constellation group (MEO scenery — not a taxonomy band). */
+  gnss: THREE.Group;
+}
+
+export function buildLayers(scene: THREE.Scene): LayerHandles {
   // — Ground disc —
   const ground = new THREE.Mesh(
     new THREE.CircleGeometry(620, 96),
@@ -136,6 +144,38 @@ export function buildLayers(scene: THREE.Scene): { leoDots: THREE.Points } {
   leoRing.position.y = LAYER_HEIGHTS.leo;
   scene.add(leoRing);
 
+  // — MEO: the GNSS shelf. Not a taxonomy band (no GNSS row in the matrix),
+  //   but the orbit ladder is incomplete — and misleading — without it. —
+  const gnss = new THREE.Group();
+  const meoRing = new THREE.Mesh(
+    new THREE.TorusGeometry(400, 0.5, 8, 128),
+    new THREE.MeshBasicMaterial({ color: 0xb9a8ff, transparent: true, opacity: 0.16 }),
+  );
+  meoRing.rotation.x = Math.PI / 2;
+  gnss.add(meoRing);
+  const gnssDotMat = new THREE.PointsMaterial({
+    color: 0xcbbcff,
+    size: 5.2,
+    sizeAttenuation: true,
+    transparent: true,
+    opacity: 0.85,
+    map: makeDotTexture(),
+    alphaTest: 0.02,
+    depthWrite: false,
+  });
+  const gnssPos = new Float32Array(6 * 3);
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2;
+    gnssPos[i * 3] = Math.cos(a) * 400;
+    gnssPos[i * 3 + 1] = (Math.random() - 0.5) * 10;
+    gnssPos[i * 3 + 2] = Math.sin(a) * 400;
+  }
+  const gnssGeo = new THREE.BufferGeometry();
+  gnssGeo.setAttribute('position', new THREE.BufferAttribute(gnssPos, 3));
+  gnss.add(new THREE.Points(gnssGeo, gnssDotMat));
+  gnss.position.y = LAYER_HEIGHTS.meo;
+  scene.add(gnss);
+
   // — GEO arc: a thin ring far overhead —
   const geoRing = new THREE.Mesh(
     new THREE.TorusGeometry(390, 0.9, 8, 128),
@@ -148,10 +188,13 @@ export function buildLayers(scene: THREE.Scene): { leoDots: THREE.Points } {
   // — Layer captions (billboarded), echoing the infographic's edge labels —
   // Captions sit on the FAR arc of each ring — that's the part the default
   // camera actually sees (the near side passes behind the viewer).
-  const geoCap = makeLayerCaption('GEO · 35,786 km · fixed overhead');
+  const geoCap = makeLayerCaption('GEO · 35,786 km · DTH / VSAT / AEHF · fixed overhead');
   geoCap.position.set(-345, LAYER_HEIGHTS.geo + 16, -180);
   scene.add(geoCap);
-  const leoCap = makeLayerCaption('LEO shell · 160–2,000 km · constellations');
+  const meoCap = makeLayerCaption('MEO · 20,200 km · GNSS: GPS / Galileo / BeiDou');
+  meoCap.position.set(-155, LAYER_HEIGHTS.meo + 14, -355);
+  scene.add(meoCap);
+  const leoCap = makeLayerCaption('LEO · 160–2,000 km · Starlink / OneWeb / Kuiper');
   leoCap.position.set(-300, LAYER_HEIGHTS.leo + 16, -275);
   scene.add(leoCap);
 
@@ -161,5 +204,5 @@ export function buildLayers(scene: THREE.Scene): { leoDots: THREE.Points } {
   key.position.set(200, 400, 150);
   scene.add(key);
 
-  return { leoDots };
+  return { leoDots, leoRing, gnss };
 }

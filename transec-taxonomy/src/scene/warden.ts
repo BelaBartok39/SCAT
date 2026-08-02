@@ -2,12 +2,15 @@
  * The warden — a draggable adversary on the ground plane.
  *
  * For every band it answers, live, from actual scene geometry: what
- * does an eavesdropper HERE actually get? The beam math is the same
- * dsp/channel model the lab overlays use (beamGainDb), so the 3D scene
- * and the signal panels never disagree.
+ * does an eavesdropper HERE actually get? Verdicts are drawn INTO the
+ * scene as sightlines (red = signal recovered, amber = energy only,
+ * no line = hears nothing) so the panel is a legend, not the only
+ * source of truth. The beam math is the same dsp/channel model the lab
+ * overlays use, and the beam axis is the same emitter→receiver link the
+ * serving beams render — scene and model cannot disagree.
  *
- * Ma et al. 2018 as a toggle: place a scatterer in the mmWave/THz beam
- * and off-axis visibility comes back.
+ * Ma et al. 2018 as a toggle: place a scatterer in the mmWave beam and
+ * off-axis visibility comes back.
  */
 
 import * as THREE from 'three';
@@ -15,6 +18,7 @@ import { Channel } from '../dsp/channel';
 import type { BandId } from '../data/types';
 import { BAND_ORDER } from '../data/types';
 import type { EmitterHandle } from './emitters';
+import { RECEIVERS } from './props';
 import { getState, setState, subscribeKeys } from '../store';
 
 type Verdict = 'visible' | 'unresolvable' | 'nothing';
@@ -25,12 +29,6 @@ interface Observation {
   reason: string;
   detailDb?: number;
 }
-
-/** Where each beamformed band is pointing (its served user on the ground). */
-const SERVE_POINT: Partial<Record<BandId, THREE.Vector3>> = {
-  'cellular-5g': new THREE.Vector3(120, 0, 280),
-  '6g-subthz': new THREE.Vector3(250, 0, 170),
-};
 
 const BEAMWIDTH_DEG: Partial<Record<BandId, number>> = {
   'cellular-5g': 10,
@@ -48,20 +46,54 @@ const BAND_SHORT: Record<BandId, string> = {
   'satcom-military': 'SAT mil',
 };
 
+// Labels speak from the DEFENDER's perspective, matching the color code
+// (red = your transmission is exposed, green = it is hidden). Wording the
+// verdicts from the warden's side ("signal recovered") made red look like
+// a success and green like a failure.
 const VERDICT_META: Record<Verdict, { icon: string; cls: string; label: string }> = {
-  visible: { icon: '●', cls: 'v-visible', label: 'SIGNAL RECOVERED' },
+  visible: { icon: '●', cls: 'v-visible', label: 'EXPOSED' },
   unresolvable: { icon: '◐', cls: 'v-unresolvable', label: 'ENERGY ONLY' },
-  nothing: { icon: '○', cls: 'v-nothing', label: 'NOTHING' },
+  nothing: { icon: '○', cls: 'v-nothing', label: 'HIDDEN' },
 };
+
+const SIGHT_COLOR: Record<Verdict, number> = {
+  visible: 0xf43f5e,
+  unresolvable: 0xf59e0b,
+  nothing: 0x000000, // never drawn
+};
+
+/** Preset warden positions that stage the three contrasts. */
+const PRESETS: { label: string; title: string; pos: () => THREE.Vector3 }[] = [
+  {
+    label: 'beside Wi-Fi',
+    title: 'Broadcast bands are heard from anywhere in range',
+    pos: () => RECEIVERS.wifi.pos.clone().add(new THREE.Vector3(30, 0, 24)),
+  },
+  {
+    label: 'in 5G beam',
+    title: 'Step into the serving beam and everything is visible',
+    pos: () => RECEIVERS['cellular-5g'].pos.clone().add(new THREE.Vector3(-6, 0, 14)),
+  },
+  {
+    label: 'far off-axis',
+    title: 'Off-axis and out of range: geometry does the hiding',
+    pos: () => new THREE.Vector3(-330, 0, -140),
+  },
+];
 
 export class Warden {
   readonly marker = new THREE.Group();
+  private hintRing: THREE.Mesh;
+  private hasDragged = false;
   private scatterer: THREE.Mesh;
   private panel: HTMLElement;
   private dragging = false;
   private groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   private raycaster = new THREE.Raycaster();
   private throttle = 0;
+  private sightGroup = new THREE.Group();
+  private sightLines = new Map<BandId, THREE.Line>();
+  private hoveredBand: BandId | null = null;
 
   constructor(
     private emitters: EmitterHandle[],
@@ -91,12 +123,23 @@ export class Warden {
     ring.rotation.x = Math.PI / 2;
     ring.position.y = 0.5;
     this.marker.add(ring);
+
+    // Pulsing "drag me" ring — retired after the first drag or preset.
+    this.hintRing = new THREE.Mesh(
+      new THREE.TorusGeometry(14, 0.7, 8, 48),
+      new THREE.MeshBasicMaterial({ color: 0xf43f5e, transparent: true, opacity: 0.5 }),
+    );
+    this.hintRing.rotation.x = Math.PI / 2;
+    this.hintRing.position.y = 0.5;
+    this.marker.add(this.hintRing);
+
     const { x, z } = getState().wardenPos;
     this.marker.position.set(x, 0, z);
     this.marker.traverse((o) => (o.userData.warden = true));
     scene.add(this.marker);
+    scene.add(this.sightGroup);
 
-    // — Scatterer (Ma et al. 2018): sits in the 5G serving beam path —
+    // — Scatterer (Ma et al. 2018): physically ON the 5G beam path —
     this.scatterer = new THREE.Mesh(
       new THREE.OctahedronGeometry(5),
       new THREE.MeshStandardMaterial({
@@ -108,26 +151,53 @@ export class Warden {
         opacity: 0.95,
       }),
     );
-    const sp = SERVE_POINT['cellular-5g']!;
-    this.scatterer.position.set(sp.x * 0.55, 8, sp.z * 0.55); // mid-beam
+    const e5g = this.emitterPos('cellular-5g');
+    this.scatterer.position.lerpVectors(e5g, RECEIVERS['cellular-5g'].pos, 0.55);
+    this.scatterer.position.y = Math.max(this.scatterer.position.y, 8);
     this.scatterer.visible = getState().scattererEnabled;
     scene.add(this.scatterer);
 
-    // — Observation panel —
+    // — Observation panel (collapsible; scrolls internally, never covers the ribbon) —
     this.panel = document.createElement('aside');
     this.panel.className = 'warden-panel';
     this.panel.innerHTML = `
-      <div class="wp-head">
+      <button class="wp-head" aria-expanded="true">
         <span class="wp-title">⌖ WARDEN OBSERVES</span>
         <span class="wp-hint">drag the red marker</span>
-      </div>
-      <ul class="wp-list" aria-live="polite"></ul>
-      <div class="wp-toggles">
-        <button class="wp-toggle" data-toggle="scatterer" aria-pressed="false"
-          title="Ma et al., Nature 563 (2018): a scatterer in the beam re-enables eavesdropping">
-          scatterer in beam</button>
+        <span class="wp-chevron" aria-hidden="true">▾</span>
+      </button>
+      <div class="wp-body">
+        <div class="wp-presets">
+          ${PRESETS.map((p, i) => `<button class="wp-preset" data-preset="${i}" title="${p.title}">${p.label}</button>`).join('')}
+        </div>
+        <ul class="wp-list" aria-live="polite"></ul>
+        <div class="wp-toggles">
+          <button class="wp-toggle" data-toggle="scatterer" aria-pressed="false"
+            title="Ma et al., Nature 563 (2018): a scatterer in the beam re-enables eavesdropping">
+            scatterer in beam</button>
+        </div>
       </div>`;
     container.appendChild(this.panel);
+
+    // Collapse/expand.
+    const headBtn = this.panel.querySelector<HTMLButtonElement>('.wp-head')!;
+    headBtn.addEventListener('click', () => {
+      const collapsed = this.panel.classList.toggle('collapsed');
+      headBtn.setAttribute('aria-expanded', String(!collapsed));
+    });
+
+    // Presets.
+    this.panel.querySelectorAll<HTMLButtonElement>('.wp-preset').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const p = PRESETS[Number(btn.dataset.preset)]!;
+        const pos = p.pos();
+        this.marker.position.set(pos.x, 0, pos.z);
+        this.retireHint();
+        setState({ wardenPos: { ...getState().wardenPos, x: pos.x, z: pos.z } });
+        this.refresh();
+      });
+    });
+
     this.panel.querySelector<HTMLButtonElement>('[data-toggle=scatterer]')!.addEventListener('click', () => {
       setState({ scattererEnabled: !getState().scattererEnabled });
     });
@@ -144,6 +214,17 @@ export class Warden {
     dom.addEventListener('pointerup', this.onUp);
 
     this.refresh();
+  }
+
+  private emitterPos(id: BandId): THREE.Vector3 {
+    return this.emitters.find((e) => e.band.id === id)!.group.position;
+  }
+
+  private retireHint(): void {
+    if (!this.hasDragged) {
+      this.hasDragged = true;
+      this.hintRing.visible = false;
+    }
   }
 
   private syncToggles(): void {
@@ -176,7 +257,6 @@ export class Warden {
     if (!this.dragging) return;
     const pt = new THREE.Vector3();
     if (this.pointerRay(e).ray.intersectPlane(this.groundPlane, pt)) {
-      // Keep the warden on the observable field.
       const r = Math.hypot(pt.x, pt.z);
       if (r > 580) pt.multiplyScalar(580 / r);
       this.marker.position.set(pt.x, 0, pt.z);
@@ -188,18 +268,17 @@ export class Warden {
   private onUp = (): void => {
     if (!this.dragging) return;
     this.dragging = false;
+    this.retireHint();
     this.setControlsEnabled(true);
     this.dom.style.cursor = 'grab';
     setState({ wardenPos: { ...getState().wardenPos, x: this.marker.position.x, z: this.marker.position.z } });
     this.refresh();
   };
 
-  /** Angle (deg) at the emitter between its serving beam and the warden. */
+  /** Angle (deg) at the emitter between its serving link and the warden. */
   private offAxisDeg(bandId: BandId): number {
-    const h = this.emitters.find((e) => e.band.id === bandId)!;
-    const serve = SERVE_POINT[bandId]!;
-    const ePos = h.group.position;
-    const a = serve.clone().sub(ePos).normalize();
+    const ePos = this.emitterPos(bandId);
+    const a = RECEIVERS[bandId].pos.clone().sub(ePos).normalize();
     const b = this.marker.position.clone().sub(ePos).normalize();
     return (Math.acos(THREE.MathUtils.clamp(a.dot(b), -1, 1)) * 180) / Math.PI;
   }
@@ -210,12 +289,12 @@ export class Warden {
     const out: Observation[] = [];
 
     for (const bandId of BAND_ORDER) {
-      const h = this.emitters.find((e) => e.band.id === bandId)!;
-      const d = w.distanceTo(h.group.position);
+      const d = w.distanceTo(this.emitterPos(bandId));
 
       switch (bandId) {
         case 'nfc': {
-          const groundD = Math.hypot(w.x - h.group.position.x, w.z - h.group.position.z);
+          const ePos = this.emitterPos(bandId);
+          const groundD = Math.hypot(w.x - ePos.x, w.z - ePos.z);
           out.push(
             groundD < 16
               ? { bandId, verdict: 'visible', reason: 'inside the near field — full read at touch range' }
@@ -247,7 +326,7 @@ export class Warden {
             out.push({ bandId, verdict: 'nothing', reason: 'molecular absorption: signal is gone at this range', detailDb: gain });
           } else if (inBeam) {
             out.push({ bandId, verdict: 'visible', reason: `inside the serving beam (${theta.toFixed(1)}° off-axis)`, detailDb: gain });
-          } else if (scatterer) {
+          } else if (scatterer && bandId === 'cellular-5g') {
             out.push({
               bandId,
               verdict: 'visible',
@@ -279,26 +358,79 @@ export class Warden {
     return out;
   }
 
-  /** Recompute + re-render the observation list. */
+  /** Rebuild the warden→emitter sightlines from the current verdicts. */
+  private rebuildSightlines(obs: Observation[]): void {
+    for (const line of this.sightLines.values()) {
+      line.geometry.dispose();
+      (line.material as THREE.Material).dispose();
+    }
+    this.sightGroup.clear();
+    this.sightLines.clear();
+
+    const eye = this.marker.position.clone().add(new THREE.Vector3(0, 15, 0));
+    for (const o of obs) {
+      if (o.verdict === 'nothing') continue; // silence is drawn as absence
+      const geo = new THREE.BufferGeometry().setFromPoints([eye, this.emitterPos(o.bandId)]);
+      const mat = new THREE.LineBasicMaterial({
+        color: SIGHT_COLOR[o.verdict],
+        transparent: true,
+        opacity: o.bandId === this.hoveredBand ? 0.95 : 0.4,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      const line = new THREE.Line(geo, mat);
+      this.sightGroup.add(line);
+      this.sightLines.set(o.bandId, line);
+    }
+  }
+
+  /** Recompute verdicts, redraw sightlines, re-render the panel list. */
   refresh(): void {
+    const obs = this.observe();
+    this.rebuildSightlines(obs);
+
     const list = this.panel.querySelector<HTMLElement>('.wp-list')!;
-    list.innerHTML = this.observe()
+    list.innerHTML = obs
       .map((o) => {
         const m = VERDICT_META[o.verdict];
         const db = o.detailDb !== undefined ? `<span class="wp-db">${o.detailDb.toFixed(0)} dB</span>` : '';
-        return `<li class="${m.cls}">
+        return `<li class="${m.cls}" data-band="${o.bandId}">
           <span class="wp-band">${m.icon} ${BAND_SHORT[o.bandId]}</span>
           <span class="wp-verdict">${m.label}${db}</span>
           <span class="wp-reason">${o.reason}</span>
         </li>`;
       })
       .join('');
+
+    // Row hover ↔ sightline + emitter highlight.
+    list.querySelectorAll<HTMLElement>('li').forEach((li) => {
+      const bandId = li.dataset.band as BandId;
+      li.addEventListener('mouseenter', () => this.setHover(bandId));
+      li.addEventListener('mouseleave', () => this.setHover(null));
+    });
+  }
+
+  private setHover(bandId: BandId | null): void {
+    this.hoveredBand = bandId;
+    for (const [id, line] of this.sightLines) {
+      (line.material as THREE.LineBasicMaterial).opacity = id === bandId ? 0.95 : bandId ? 0.15 : 0.4;
+    }
+    for (const h of this.emitters) {
+      const b = h.label.userData.baseScale as { x: number; y: number };
+      const f = h.band.id === bandId ? 1.25 : 1;
+      h.label.scale.set(b.x * f, b.y * f, 1);
+    }
   }
 
   update(_dt: number, t: number): void {
+    if (getState().reducedMotion) return;
     // Idle spin on the scatterer so it reads as "an object", not UI.
-    if (this.scatterer.visible && !getState().reducedMotion) {
-      this.scatterer.rotation.y = t * 0.8;
+    if (this.scatterer.visible) this.scatterer.rotation.y = t * 0.8;
+    // Pulsing drag hint until first interaction.
+    if (!this.hasDragged) {
+      const s = 1 + Math.sin(t * 2.4) * 0.28;
+      this.hintRing.scale.setScalar(s);
+      (this.hintRing.material as THREE.MeshBasicMaterial).opacity = 0.34 + Math.sin(t * 2.4) * 0.22;
     }
   }
 }

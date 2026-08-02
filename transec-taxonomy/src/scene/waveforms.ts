@@ -20,7 +20,23 @@ export interface Waveform {
   /** Overall opacity multiplier 0..1 (lens cross-fades through this). */
   setFade(f: number): void;
   setColor(c: THREE.Color): void;
+  /** Optional: aim the null/notch at a world direction (unit, emitter-local). */
+  setNullDir?(dir: THREE.Vector3): void;
   dispose(): void;
+}
+
+/** Options shared by beam-type waveforms. `aimDir` is a unit direction in
+ *  the emitter's local frame (== world, emitter groups are unrotated). */
+export interface WaveformOpts {
+  keyed?: boolean;
+  aimDir?: THREE.Vector3;
+}
+
+const DOWN = new THREE.Vector3(0, -1, 0);
+
+/** Orient an apex-at-origin, opening-along−Y cone toward `dir`. */
+function aimCone(obj: THREE.Object3D, dir: THREE.Vector3): void {
+  obj.quaternion.setFromUnitVectors(DOWN, dir.clone().normalize());
 }
 
 /** Gradient texture used by beams/falloff cones (built once, shared). */
@@ -220,31 +236,29 @@ class HopScatter extends BaseWaveform {
 // ——— pencilBeam: narrow steerable cone (mmWave / THz) ————————————————
 
 class PencilBeam extends BaseWaveform {
-  private cone: THREE.Mesh;
-  constructor(color: THREE.Color, len = 85, apertureDeg = 4.5) {
+  constructor(color: THREE.Color, aimDir?: THREE.Vector3, len = 85, apertureDeg = 4.5) {
     super();
     const r = Math.tan((apertureDeg * Math.PI) / 180) * len;
     const geo = new THREE.ConeGeometry(r, len, 20, 1, true);
     geo.translate(0, -len / 2, 0); // apex at origin
-    this.cone = new THREE.Mesh(geo, this.track(additiveMat(color, 0.5, getBeamTexture())));
-    // Aim slightly downward toward the scene center, like a serving beam.
-    this.cone.rotation.z = Math.PI / 2.6;
-    this.cone.rotation.y = 0.6;
-    this.group.add(this.cone);
+    const cone = new THREE.Mesh(geo, this.track(additiveMat(color, 0.5, getBeamTexture())));
+    // Aim at the served receiver so the mechanism cone and the link agree.
+    aimCone(cone, aimDir ?? new THREE.Vector3(0.8, -0.5, 0.6));
+    this.group.add(cone);
   }
   update(_dt: number, t: number): void {
-    // Subtle steering sweep — beams track users.
-    this.cone.rotation.y = 0.6 + Math.sin(t * 0.5) * 0.35;
+    // Subtle steering sway about vertical — beams track users.
+    this.group.rotation.y = Math.sin(t * 0.5) * 0.12;
   }
 }
 
 // ——— nulledLobe: broad lobe with a carved null ————————————————————————
 
 class NulledLobe extends BaseWaveform {
-  private notch: THREE.Mesh;
-  constructor(color: THREE.Color) {
+  private notch: THREE.Group;
+  constructor(color: THREE.Color, aimDir?: THREE.Vector3) {
     super();
-    // Broad serving lobe
+    // Broad serving lobe, aimed at the receiver.
     const len = 55;
     const lobe = new THREE.Mesh(
       (() => {
@@ -254,31 +268,45 @@ class NulledLobe extends BaseWaveform {
       })(),
       this.track(additiveMat(color, 0.3, getBeamTexture())),
     );
-    lobe.rotation.z = Math.PI / 2.2;
+    aimCone(lobe, aimDir ?? new THREE.Vector3(0.8, -0.5, 0.6));
     this.group.add(lobe);
-    // The null: a dark wedge cut toward the adversary direction.
-    const ng = new THREE.ConeGeometry(Math.tan(0.16) * 60, 60, 12, 1, true);
+
+    // The null: the wedge the array deliberately goes deaf toward.
+    // Solid black failed on a dark scene — render it as a translucent
+    // shadow with a warden-red wireframe rim, and aim it at the warden
+    // (setNullDir) so dragging the adversary moves the null.
+    const ng = new THREE.ConeGeometry(Math.tan(0.16) * 60, 60, 10, 1, true);
     ng.translate(0, -30, 0);
-    this.notch = new THREE.Mesh(
+    this.notch = new THREE.Group();
+    const fill = new THREE.Mesh(
       ng,
       new THREE.MeshBasicMaterial({
-        color: 0x000000,
+        color: 0x07070f,
         transparent: true,
-        opacity: 0.85,
+        opacity: 0.5,
         depthWrite: false,
         side: THREE.DoubleSide,
       }),
     );
-    this.notch.rotation.z = Math.PI / 2.2 + 0.5;
+    this.notch.add(fill);
+    const rimMat = new THREE.MeshBasicMaterial({
+      color: 0xf43f5e,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.35,
+      depthWrite: false,
+    });
+    this.track(rimMat);
+    this.notch.add(new THREE.Mesh(ng.clone(), rimMat));
+    aimCone(this.notch, new THREE.Vector3(0.2, -0.4, 0.9));
     this.group.add(this.notch);
   }
-  /** Later phases point this at the warden. */
-  aimNullAt(dir: THREE.Vector3): void {
-    this.notch.lookAt(this.group.localToWorld(dir.clone()));
-    this.notch.rotateX(-Math.PI / 2);
+  /** Aim the null at the adversary (unit direction, emitter-local frame). */
+  setNullDir(dir: THREE.Vector3): void {
+    aimCone(this.notch, dir);
   }
-  update(_dt: number, t: number): void {
-    this.group.rotation.y = Math.sin(t * 0.4) * 0.2;
+  update(): void {
+    /* statically aimed; the null tracks the warden via setNullDir */
   }
 }
 
@@ -286,24 +314,24 @@ class NulledLobe extends BaseWaveform {
 
 class AbsorptionFalloff extends BaseWaveform {
   private motes: THREE.Points;
-  constructor(color: THREE.Color) {
+  constructor(color: THREE.Color, aimDir?: THREE.Vector3) {
     super();
     // Short beam whose gradient dies well before the scene edge.
+    const dir = (aimDir ?? new THREE.Vector3(0.8, -0.5, 0.6)).clone().normalize();
     const len = 48;
     const geo = new THREE.ConeGeometry(Math.tan(0.06) * len, len, 14, 1, true);
     geo.translate(0, -len / 2, 0);
     const beam = new THREE.Mesh(geo, this.track(additiveMat(color, 0.75, getBeamTexture())));
-    beam.rotation.z = Math.PI / 2.4;
-    beam.rotation.y = 0.4;
+    aimCone(beam, dir);
     this.group.add(beam);
-    // Absorption motes: the medium itself eating the signal.
+    // Absorption motes: the medium itself eating the signal, along the beam.
     const n = 60;
     const pos = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) {
       const d = Math.random() * len * 0.9;
-      pos[i * 3] = Math.cos(0.4) * d * 0.8 + (Math.random() - 0.5) * 6;
-      pos[i * 3 + 1] = -Math.sin(0.35) * d * 0.5 + (Math.random() - 0.5) * 6;
-      pos[i * 3 + 2] = Math.sin(0.4) * d * 0.8 + (Math.random() - 0.5) * 6;
+      pos[i * 3] = dir.x * d + (Math.random() - 0.5) * 6;
+      pos[i * 3 + 1] = dir.y * d + (Math.random() - 0.5) * 6;
+      pos[i * 3 + 2] = dir.z * d + (Math.random() - 0.5) * 6;
     }
     const pg = new THREE.BufferGeometry();
     pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
@@ -353,16 +381,16 @@ class ConstantCarrier extends BaseWaveform {
 export function createWaveform(
   kind: WaveformKind,
   color: THREE.Color,
-  opts: { keyed?: boolean } = {},
+  opts: WaveformOpts = {},
 ): Waveform {
   switch (kind) {
     case 'nearFieldBubble': return new NearFieldBubble(color);
     case 'omniRings': return new OmniRings(color);
     case 'spreadHaze': return new SpreadHaze(color);
     case 'hopScatter': return new HopScatter(color, opts.keyed ?? false);
-    case 'pencilBeam': return new PencilBeam(color);
-    case 'nulledLobe': return new NulledLobe(color);
-    case 'absorptionFalloff': return new AbsorptionFalloff(color);
+    case 'pencilBeam': return new PencilBeam(color, opts.aimDir);
+    case 'nulledLobe': return new NulledLobe(color, opts.aimDir);
+    case 'absorptionFalloff': return new AbsorptionFalloff(color, opts.aimDir);
     case 'constantCarrier': return new ConstantCarrier(color);
   }
 }

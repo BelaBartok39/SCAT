@@ -90,6 +90,14 @@ export class SceneRoot {
       container,
     );
     this.addUpdater((dt, elapsed) => warden.update(dt, elapsed));
+    // The adversary drives the arrays' nulls: drag the jammer, drag the null.
+    this.addUpdater(() => lens.setNullTarget(warden.marker.position));
+
+    // Under any lens the mechanism waveforms carry the story; the static
+    // serving beams would double the cones (and break the TFS blackout).
+    const syncBeams = () => { beams.group.visible = getState().lens === null; };
+    subscribeKeys(['lens'], syncBeams);
+    syncBeams();
     // Lens changes must repaint even when the loop is paused (reduced motion).
     subscribeKeys(['lens'], () => {
       if (!this.running) this.renderFrame(1 / 60, this.clock.elapsedTime);

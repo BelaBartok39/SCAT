@@ -16,6 +16,7 @@ import { cellFor } from '../data/types';
 import type { EmitterHandle } from './emitters';
 import type { Waveform, WaveformKind } from './waveforms';
 import { createWaveform } from './waveforms';
+import { RECEIVERS } from './props';
 import { getState, subscribeKeys } from '../store';
 
 /** Scene-tuned maturity palette (brighter than the matrix fills, for glow). */
@@ -99,15 +100,38 @@ export class Lens {
 
       const kind = cell.maturity === 'W' ? null : visualFor(cell.mechanismIds);
       if (kind) {
-        // Keyed hop patterns are the military variant.
+        // Keyed hop patterns are the military variant; beam-type visuals
+        // aim at the band's actual receiver so cone and link agree.
         const keyed = handle.band.id === 'satcom-military';
-        slot.active = createWaveform(kind, color, { keyed });
+        const aimDir = RECEIVERS[handle.band.id].pos
+          .clone()
+          .add(new THREE.Vector3(0, 6, 0))
+          .sub(handle.group.position)
+          .normalize();
+        slot.active = createWaveform(kind, color, { keyed, aimDir });
         slot.targetFade = intensity;
         slot.fade = 0;
         handle.group.add(slot.active.group);
       } else {
         slot.targetFade = 0;
       }
+    }
+  }
+
+  /**
+   * Aim every active null at the adversary's position (world coords).
+   * Called by the scene each frame with the warden marker — dragging the
+   * jammer visibly drags the array's null with it.
+   */
+  setNullTarget(worldPos: THREE.Vector3): void {
+    for (const slot of this.slots) {
+      if (!slot.active?.setNullDir) continue;
+      const dir = worldPos
+        .clone()
+        .add(new THREE.Vector3(0, 12, 0))
+        .sub(slot.handle.group.position)
+        .normalize();
+      slot.active.setNullDir(dir);
     }
   }
 

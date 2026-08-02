@@ -297,6 +297,8 @@ export class Warden {
 
   update(_dt: number, t: number): void {
     // Idle spin on the scatterer so it reads as "an object", not UI.
-    if (this.scatterer.visible) this.scatterer.rotation.y = t * 0.8;
+    if (this.scatterer.visible && !getState().reducedMotion) {
+      this.scatterer.rotation.y = t * 0.8;
+    }
   }
 }

@@ -6,5 +6,12 @@ export default defineConfig({
   build: {
     target: 'es2022',
     chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        // three.js is by far the largest dependency; isolating it lets the
+        // app shell iterate without invalidating the cached vendor chunk.
+        manualChunks: { three: ['three'] },
+      },
+    },
   },
 });

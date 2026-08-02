@@ -242,6 +242,16 @@ export function createGenerator(scheme: ModulationScheme): Generator {
     }
 
     case '3g-dsss': {
+      // EMA-smoothed PSDs: single-frame periodograms have ~5 dB variance,
+      // which buries the ~10·log10(SF/occupancy) level difference the demo
+      // exists to show. Smoothing makes the relative levels legible.
+      let emaSpread: Float64Array | null = null;
+      let emaNarrow: Float64Array | null = null;
+      const ema = (prev: Float64Array | null, cur: Float64Array): Float64Array => {
+        if (!prev) return cur.slice();
+        for (let i = 0; i < cur.length; i++) prev[i] = prev[i]! * 0.82 + cur[i]! * 0.18;
+        return prev;
+      };
       return {
         params: p,
         next(): LabFrame {
@@ -253,6 +263,8 @@ export function createGenerator(scheme: ModulationScheme): Generator {
           const noisySpread = Channel.awgn(normalizePower(spread), p.snrDb ?? 14, rng);
           // Narrowband reference: the SAME power unspread — towering PSD peak.
           const narrow = normalizePower(scBurst('qpsk', FFT_SIZE / 8, 8, rng).iq);
+          emaSpread = ema(emaSpread, psdOf(noisySpread));
+          emaNarrow = ema(emaNarrow, psdOf(narrow));
           return {
             spreading: {
               bits,
@@ -266,8 +278,8 @@ export function createGenerator(scheme: ModulationScheme): Generator {
               label: `spreading factor ${sf}`,
             },
             spectrum: {
-              psd: psdOf(noisySpread),
-              psdCompare: psdOf(narrow),
+              psd: emaSpread,
+              psdCompare: emaNarrow,
               dbMin: DB_MIN,
               dbMax: DB_MAX,
               noiseFloorDb: -35,

@@ -113,11 +113,14 @@ export class Lens {
 
   /** Per-frame: advance cross-fades and animate live waveforms. */
   update(dt: number, elapsed: number): void {
+    // Reduced motion: fades still resolve (the lens must work as a static
+    // re-skin) but waveform animation is frozen.
+    const frozen = getState().reducedMotion;
     for (const slot of this.slots) {
       if (slot.active) {
         slot.fade = Math.min(slot.targetFade, slot.fade + dt * FADE_SPEED);
         slot.active.setFade(slot.fade);
-        slot.active.update(dt, elapsed);
+        if (!frozen) slot.active.update(dt, elapsed);
       }
       for (let i = slot.dying.length - 1; i >= 0; i--) {
         const w = slot.dying[i]!;

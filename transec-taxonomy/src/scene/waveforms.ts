@@ -30,6 +30,8 @@ export interface Waveform {
 export interface WaveformOpts {
   keyed?: boolean;
   aimDir?: THREE.Vector3;
+  /** Emitter→receiver distance, so link-spanning visuals actually reach. */
+  distance?: number;
 }
 
 const DOWN = new THREE.Vector3(0, -1, 0);
@@ -236,8 +238,9 @@ class HopScatter extends BaseWaveform {
 // ——— pencilBeam: narrow steerable cone (mmWave / THz) ————————————————
 
 class PencilBeam extends BaseWaveform {
-  constructor(color: THREE.Color, aimDir?: THREE.Vector3, len = 85, apertureDeg = 4.5) {
+  constructor(color: THREE.Color, aimDir?: THREE.Vector3, distance?: number, apertureDeg = 4.5) {
     super();
+    const len = distance ?? 85;
     const r = Math.tan((apertureDeg * Math.PI) / 180) * len;
     const geo = new THREE.ConeGeometry(r, len, 20, 1, true);
     geo.translate(0, -len / 2, 0); // apex at origin
@@ -355,21 +358,20 @@ class AbsorptionFalloff extends BaseWaveform {
 // ——— constantCarrier: steady, unwavering emission (TFS / EMCON) ———————
 
 class ConstantCarrier extends BaseWaveform {
-  constructor(color: THREE.Color) {
+  constructor(color: THREE.Color, aimDir?: THREE.Vector3, distance?: number) {
     super();
-    // A perfectly steady column — the absence of variation IS the message.
-    const beam = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.1, 1.1, 120, 10, 1, true),
-      this.track(additiveMat(color, 0.55)),
-    );
-    beam.position.y = -60;
-    this.group.add(beam);
-    const halo = new THREE.Mesh(
-      new THREE.CylinderGeometry(2.6, 2.6, 120, 10, 1, true),
-      this.track(additiveMat(color, 0.14)),
-    );
-    halo.position.y = -60;
-    this.group.add(halo);
+    // A perfectly steady column down the real link — the absence of
+    // variation IS the message. It must reach the receiver: a carrier
+    // that stops in mid-air says nothing about emission control.
+    const dir = (aimDir ?? DOWN).clone().normalize();
+    const len = distance ?? 120;
+    for (const [radius, opacity] of [[1.1, 0.55], [2.6, 0.14]] as const) {
+      const geo = new THREE.CylinderGeometry(radius, radius, len, 10, 1, true);
+      geo.translate(0, -len / 2, 0); // top end at the emitter
+      const mesh = new THREE.Mesh(geo, this.track(additiveMat(color, opacity)));
+      aimCone(mesh, dir);
+      this.group.add(mesh);
+    }
   }
   update(): void {
     /* deliberately static — constant envelope */
@@ -388,9 +390,11 @@ export function createWaveform(
     case 'omniRings': return new OmniRings(color);
     case 'spreadHaze': return new SpreadHaze(color);
     case 'hopScatter': return new HopScatter(color, opts.keyed ?? false);
-    case 'pencilBeam': return new PencilBeam(color, opts.aimDir);
+    case 'pencilBeam': return new PencilBeam(color, opts.aimDir, opts.distance);
     case 'nulledLobe': return new NulledLobe(color, opts.aimDir);
+    // absorptionFalloff keeps its own short length ON PURPOSE — the beam
+    // dying before it arrives is the mechanism being illustrated.
     case 'absorptionFalloff': return new AbsorptionFalloff(color, opts.aimDir);
-    case 'constantCarrier': return new ConstantCarrier(color);
+    case 'constantCarrier': return new ConstantCarrier(color, opts.aimDir, opts.distance);
   }
 }

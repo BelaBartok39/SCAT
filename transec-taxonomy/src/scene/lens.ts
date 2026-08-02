@@ -103,12 +103,13 @@ export class Lens {
         // Keyed hop patterns are the military variant; beam-type visuals
         // aim at the band's actual receiver so cone and link agree.
         const keyed = handle.band.id === 'satcom-military';
-        const aimDir = RECEIVERS[handle.band.id].pos
+        const toReceiver = RECEIVERS[handle.band.id].pos
           .clone()
           .add(new THREE.Vector3(0, 6, 0))
-          .sub(handle.group.position)
-          .normalize();
-        slot.active = createWaveform(kind, color, { keyed, aimDir });
+          .sub(handle.group.position);
+        const distance = toReceiver.length();
+        const aimDir = toReceiver.clone().normalize();
+        slot.active = createWaveform(kind, color, { keyed, aimDir, distance });
         slot.targetFade = intensity;
         slot.fade = 0;
         handle.group.add(slot.active.group);

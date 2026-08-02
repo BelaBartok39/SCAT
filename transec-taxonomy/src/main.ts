@@ -10,6 +10,7 @@ import './styles/matrix.css';
 import './styles/modal.css';
 import './styles/scene.css';
 import './styles/ribbon.css';
+import './styles/lab.css';
 
 import { subscribeKeys, getState } from './store';
 import { initRouter } from './router';
@@ -17,6 +18,7 @@ import { mountChrome } from './views/chrome';
 import { mountMatrix } from './views/matrix';
 import { mountModal } from './views/modal';
 import { mountScene } from './views/scene';
+import { mountLab } from './views/lab';
 
 const app = document.getElementById('app')!;
 
@@ -57,6 +59,7 @@ subscribeKeys(['view'], syncViews);
 mountMatrix(containers.matrix, 'matrix');
 mountMatrix(containers.frontier, 'frontier');
 mountModal();
+mountLab();
 mountScene(containers.scene);
 
 initRouter();

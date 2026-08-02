@@ -1,0 +1,120 @@
+/* ——— Modulation lab: panels, signal tab, full-screen overlay ——— */
+
+.lab-panel { display: flex; flex-direction: column; gap: 10px; }
+
+.lab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+}
+.lab-panel.compact .lab-grid { grid-template-columns: 1fr; }
+
+.lab-cell {
+  position: relative;
+  height: 240px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.lab-panel.compact .lab-cell { height: 170px; }
+.lab-cell canvas { display: block; width: 100%; height: 100%; }
+
+.lab-caption {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.lab-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+}
+.lab-slider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-secondary);
+}
+.lab-slider input[type='range'] { width: 130px; accent-color: var(--accent-indigo); }
+.lab-slider output { color: var(--accent-cyan); min-width: 3ch; text-align: right; }
+.lab-step {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+/* Signal tab blocks */
+.signal-scheme { margin-bottom: 18px; }
+.signal-scheme-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.signal-scheme-head .s-name { font-weight: 600; font-size: 13px; }
+.signal-scheme-head .s-open {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-cyan);
+  background: transparent;
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.signal-scheme-head .s-open:hover { background: rgba(6, 182, 212, 0.12); }
+
+/* Full-screen overlay */
+.lab-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 4, 10, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-med);
+}
+.lab-overlay.open { opacity: 1; pointer-events: auto; }
+
+.lab-shell {
+  width: min(1080px, calc(100vw - 40px));
+  max-height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 10, 22, 0.98);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7), var(--shadow-glow);
+}
+.lab-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 18px 22px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.lab-title { font-size: 18px; font-weight: 800; }
+.lab-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-cyan);
+  margin-top: 3px;
+}
+.lab-body { padding: 16px 22px 22px; overflow-y: auto; }

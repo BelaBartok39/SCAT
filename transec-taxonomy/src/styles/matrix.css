@@ -1,0 +1,109 @@
+/* ——— Matrix view: the 8×5 taxonomy grid ——— */
+
+.matrix-wrap {
+  height: 100%;
+  overflow: auto;
+  padding: 28px 32px 40px;
+}
+
+.matrix-intro {
+  max-width: 720px;
+  margin-bottom: 20px;
+}
+.matrix-intro h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.matrix-intro p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+.matrix-table {
+  border-collapse: separate;
+  border-spacing: 4px;
+  font-family: var(--font-mono);
+}
+
+.matrix-table th {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  padding: 8px 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+.matrix-table thead th[data-obj] {
+  text-align: center;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
+}
+.matrix-table thead th[data-obj]:hover { color: var(--text-primary); border-color: var(--border-accent); }
+.matrix-table thead th[data-obj].lens-active {
+  color: #fff;
+  background: var(--obj-color);
+  border-color: var(--obj-color);
+}
+
+.matrix-cell {
+  width: 148px;
+  min-height: 52px;
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.35;
+  text-align: left;
+  vertical-align: top;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-med);
+  display: block;
+  width: 100%;
+}
+.matrix-cell:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+.matrix-cell:focus-visible { outline: 2px solid var(--accent-indigo); outline-offset: 2px; }
+
+.matrix-cell .m-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  color: #fff;
+}
+.matrix-cell .m-note { display: block; color: var(--text-secondary); }
+
+.matrix-cell.mat-N { background: color-mix(in srgb, var(--maturity-n) 30%, var(--bg-card)); border-color: var(--maturity-n); }
+.matrix-cell.mat-E { background: color-mix(in srgb, var(--maturity-e) 38%, var(--bg-card)); border-color: var(--maturity-e); }
+.matrix-cell.mat-R { background: color-mix(in srgb, var(--maturity-r) 24%, var(--bg-card)); border-color: var(--maturity-r); }
+.matrix-cell.mat-W { background: var(--maturity-w); border-color: rgba(107,114,128,0.25); }
+.matrix-cell.mat-W .m-note { color: var(--maturity-w-text); }
+
+.matrix-cell.mat-N .m-badge { background: var(--maturity-n); }
+.matrix-cell.mat-E .m-badge { background: var(--maturity-e); }
+.matrix-cell.mat-R .m-badge { background: var(--maturity-r); }
+.matrix-cell.mat-W .m-badge { background: #4b5563; }
+
+/* Lens dimming: when a lens is active, other columns recede */
+.matrix-table.lens-on .matrix-cell:not(.in-lens) { opacity: 0.28; }
+.matrix-table.lens-on .matrix-cell.in-lens { box-shadow: 0 0 16px color-mix(in srgb, var(--obj-color) 40%, transparent); }
+
+/* Frontier mode reuses the table; non-gap cells recede hard */
+.matrix-table.frontier .matrix-cell:not(.mat-W):not(.mat-R) { opacity: 0.15; }
+
+.matrix-legend {
+  display: flex;
+  gap: 18px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.matrix-legend .leg {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-secondary);
+}
+.matrix-legend .chip { width: 14px; height: 14px; border-radius: 4px; }

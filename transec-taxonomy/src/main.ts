@@ -6,10 +6,14 @@
 
 import './styles/tokens.css';
 import './styles/app.css';
+import './styles/matrix.css';
+import './styles/modal.css';
 
 import { subscribeKeys, getState } from './store';
 import { initRouter } from './router';
 import { mountChrome } from './views/chrome';
+import { mountMatrix } from './views/matrix';
+import { mountModal } from './views/modal';
 
 const app = document.getElementById('app')!;
 
@@ -46,6 +50,10 @@ function syncViews(): void {
   }
 }
 subscribeKeys(['view'], syncViews);
+
+mountMatrix(containers.matrix, 'matrix');
+mountMatrix(containers.frontier, 'frontier');
+mountModal();
 
 initRouter();
 syncViews();

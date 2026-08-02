@@ -1,0 +1,77 @@
+/* ——— Warden observation panel ——— */
+
+.warden-panel {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 270px;
+  z-index: 10;
+  background: rgba(10, 10, 22, 0.88);
+  border: 1px solid rgba(244, 63, 94, 0.28);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+  padding: 12px 14px;
+  font-family: var(--font-mono);
+}
+
+.wp-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.wp-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent-pink);
+}
+.wp-hint { font-size: 9px; color: var(--text-muted); }
+
+.wp-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.wp-list li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1px 8px;
+  font-size: 10px;
+  padding: 5px 7px;
+  border-radius: 6px;
+  background: rgba(15, 15, 30, 0.6);
+}
+.wp-band { font-weight: 700; color: var(--text-primary); white-space: nowrap; }
+.wp-verdict { text-align: right; letter-spacing: 0.06em; }
+.wp-reason {
+  grid-column: 1 / -1;
+  color: var(--text-muted);
+  font-size: 9px;
+  line-height: 1.45;
+}
+.wp-db { margin-left: 6px; color: var(--text-muted); }
+
+.v-visible .wp-verdict { color: var(--accent-pink); }
+.v-visible { border-left: 2px solid var(--accent-pink); }
+.v-unresolvable .wp-verdict { color: var(--accent-amber); }
+.v-unresolvable { border-left: 2px solid var(--accent-amber); }
+.v-nothing .wp-verdict { color: var(--accent-green); }
+.v-nothing { border-left: 2px solid rgba(16, 185, 129, 0.5); }
+
+.wp-toggles { margin-top: 10px; display: flex; gap: 8px; }
+.wp-toggle {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.wp-toggle:hover { color: var(--text-primary); border-color: var(--accent-amber); }
+.wp-toggle.on {
+  color: #1a1206;
+  background: var(--accent-amber);
+  border-color: var(--accent-amber);
+  font-weight: 700;
+}

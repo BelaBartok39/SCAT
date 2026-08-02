@@ -11,6 +11,7 @@ import { buildEmitters } from './emitters';
 import type { EmitterHandle } from './emitters';
 import { CameraDirector } from './camera';
 import { Lens } from './lens';
+import { Warden } from './warden';
 import { getState, setState, subscribeKeys } from '../store';
 import type { BandId } from '../data/types';
 
@@ -65,6 +66,16 @@ export class SceneRoot {
 
     const lens = new Lens(this.emitters);
     this.addUpdater((dt, elapsed) => lens.update(dt, elapsed));
+
+    const warden = new Warden(
+      this.emitters,
+      this.scene,
+      this.camera,
+      this.renderer.domElement,
+      (on) => { this.controls.enabled = on; },
+      container,
+    );
+    this.addUpdater((dt, elapsed) => warden.update(dt, elapsed));
     // Lens changes must repaint even when the loop is paused (reduced motion).
     subscribeKeys(['lens'], () => {
       if (!this.running) this.renderFrame(1 / 60, this.clock.elapsedTime);

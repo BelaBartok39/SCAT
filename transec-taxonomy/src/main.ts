@@ -11,6 +11,7 @@ import './styles/modal.css';
 import './styles/scene.css';
 import './styles/ribbon.css';
 import './styles/lab.css';
+import './styles/warden.css';
 
 import { subscribeKeys, getState } from './store';
 import { initRouter } from './router';

@@ -1,0 +1,45 @@
+/* ——— 3D scene view ——— */
+
+/* .screen already provides position:absolute+inset:0 — do not override
+   position here or the container collapses to zero height. */
+.scene-container {
+  overflow: hidden;
+}
+
+.scene-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+.scene-canvas:active { cursor: grabbing; }
+
+.scene-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-secondary);
+  font-size: 13.5px;
+}
+.scene-fallback button {
+  background: none;
+  border: none;
+  color: var(--accent-cyan);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,5 +1,5 @@
 /**
- * Matrix view — the 8×5 taxonomy grid at full fidelity.
+ * Matrix view — the 9×5 taxonomy grid at full fidelity.
  * The canonical, keyboard-navigable representation of the dataset.
  * Also renders the Frontier variant (same table, gap emphasis).
  */

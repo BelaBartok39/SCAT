@@ -40,6 +40,7 @@ export function mountRibbon(
     bluetooth: 2.44e9,
     wifi: 5.5e9,
     'satcom-civil': 14e9,
+    'satcom-leo': 10.7e9,
     'cellular-5g': 28e9,
     'satcom-military': 44e9,
     '6g-subthz': 150e9,

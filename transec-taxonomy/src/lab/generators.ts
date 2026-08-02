@@ -365,6 +365,39 @@ export function createGenerator(scheme: ModulationScheme): Generator {
       };
     }
 
+    case 'satleo-ofdm': {
+      const wf = new Waterfall();
+      let beamCell = 0;
+      let dwell = 0;
+      return {
+        params: p,
+        next(): LabFrame {
+          // Beam-hopping: the OFDM block jumps between ground-cell slots on a
+          // fixed schedule — energetic, structured, and utterly public.
+          if (++dwell % 22 === 0) beamCell = (beamCell + 1) % 4;
+          const used = Math.max(16, Math.round(p.subcarriers ?? 52));
+          const iq = ofdmWaveform(FFT_SIZE, used, 'qpsk', rng);
+          const noisy = Channel.awgn(iq, p.snrDb ?? 16, rng);
+          const psd = psdOf(noisy);
+          // Shift the occupied block to the current beam cell's sub-band.
+          const row = new Float64Array(FFT_SIZE);
+          row.fill(DB_MIN + 8);
+          const cellW = Math.floor(FFT_SIZE / 4);
+          const start = beamCell * cellW;
+          const center = Math.floor((FFT_SIZE - used) / 2);
+          for (let i = 0; i < cellW && start + i < FFT_SIZE; i++) {
+            const src = center + Math.floor((i / cellW) * used);
+            row[start + i] = psd[src] ?? DB_MIN + 8;
+          }
+          const rows = wf.push(row);
+          return {
+            spectrum: { psd, dbMin: DB_MIN, dbMax: DB_MAX, label: 'OFDM downlink — one spot-beam dwell' },
+            timeFreq: { rows, dbMin: DB_MIN, dbMax: DB_MAX, label: 'beam-hop schedule across ground cells' },
+          };
+        },
+      };
+    }
+
     case 'satciv-apsk': {
       return {
         params: p,

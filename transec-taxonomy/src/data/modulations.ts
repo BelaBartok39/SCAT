@@ -80,6 +80,16 @@ export const MODULATIONS: ModulationScheme[] = [
     caption: 'Ring constellations keep the envelope nearly constant — what a saturated satellite amplifier demands.',
   },
   {
+    id: 'satleo-ofdm',
+    bandId: 'satcom-leo',
+    name: 'Beam-hopped OFDM downlink',
+    views: ['spectrum', 'timeFreq'],
+    params: { subcarriers: 52, snrDb: 16 },
+    demonstrates: ['lpi', 'lpd'],
+    caption:
+      'The megaconstellation downlink: OFDM frames hopping between ground cells on a schedule — public enough that researchers repurpose them as navigation beacons.',
+  },
+  {
     id: 'satmil-fhss',
     bandId: 'satcom-military',
     name: 'EHF FHSS — keyed hopping + DSSS',

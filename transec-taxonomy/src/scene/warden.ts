@@ -42,7 +42,8 @@ const BAND_SHORT: Record<BandId, string> = {
   'cellular-3g-4g': '3G/4G',
   'cellular-5g': '5G NR',
   '6g-subthz': '6G',
-  'satcom-civil': 'SAT civ',
+  'satcom-civil': 'SAT GEO',
+  'satcom-leo': 'SAT LEO',
   'satcom-military': 'SAT mil',
 };
 
@@ -345,6 +346,13 @@ export class Warden {
         }
         case 'satcom-civil':
           out.push({ bandId, verdict: 'visible', reason: 'continental footprint; DVB-S2X waveform is an open standard' });
+          break;
+        case 'satcom-leo':
+          out.push({
+            bandId,
+            verdict: 'visible',
+            reason: 'spot beam floods this whole ground cell; frame structure publicly characterized',
+          });
           break;
         case 'satcom-military':
           out.push({

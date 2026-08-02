@@ -327,6 +327,56 @@ export const CELLS: Cell[] = [
     mechanismIds: [],
   },
 
+  // ——— SATCOM — civil LEO ——————————————————————————————————————————
+  // Split from the civil row: megaconstellation links have their own
+  // TRANSEC story — the downlink floods a whole ground cell, and the
+  // frame structure has been publicly reverse-engineered.
+  {
+    bandId: 'satcom-leo',
+    objectiveId: 'lpd',
+    maturity: 'W',
+    note: 'cell-wide downlink',
+    mechanismIds: [],
+    detail:
+      'The spot beam illuminates a ground cell far larger than any one user, so the downlink is trivially detectable by every receiver in it. The uplink is the direction that actually matters for LPD: a directional terminal still radiates, and satellite-side monitoring can triangulate the user on the ground (Koisser et al., 2024).',
+  },
+  {
+    bandId: 'satcom-leo',
+    objectiveId: 'lpi',
+    maturity: 'W',
+    note: 'frames characterized',
+    mechanismIds: [],
+    detail:
+      'The Ku-band downlink frame and synchronization structure have been blindly reverse-engineered from third-party observation and reused as navigation beacons (Humphreys et al., 2023; Kozhaya et al., 2025) — the opposite of resisting parameter analysis, and the intercept margin improves as more of the beacon is decoded.',
+  },
+  {
+    bandId: 'satcom-leo',
+    objectiveId: 'lpe',
+    maturity: 'W',
+    note: 'crypto above PHY',
+    mechanismIds: [],
+    detail:
+      'Exploitation resistance rests entirely on upper-layer encryption; the physical layer adds none. The precedent is GEO, where cheap consumer equipment recovered cleartext downlink payloads at scale (Pavur et al., 2020; Zhang et al., 2025) — LEO payloads appear encrypted, but that protection lives above the PHY, which is out of TRANSEC scope.',
+  },
+  {
+    bandId: 'satcom-leo',
+    objectiveId: 'aj',
+    maturity: 'R',
+    note: 'beam + orbit agility',
+    mechanismIds: ['beam-confinement'],
+    detail:
+      'Beam-hopped spot beams, constellation diversity and rapid handover give an emerging, partly demonstrated resilience (Yue et al., 2023) — but it is architectural agility, not an engineered PHY anti-jam waveform, and LEO proximity also lets a ground jammer succeed at lower power.',
+  },
+  {
+    bandId: 'satcom-leo',
+    objectiveId: 'tfs',
+    maturity: 'W',
+    note: '—',
+    mechanismIds: [],
+    detail:
+      'Beam-hop schedules and per-cell traffic timing are observable externals; nothing at the PHY conceals activity patterns.',
+  },
+
   // ——— SATCOM — military ——————————————————————————————————————————
   {
     bandId: 'satcom-military',

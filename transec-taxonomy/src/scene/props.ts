@@ -23,6 +23,7 @@ export const RECEIVERS: Record<BandId, { pos: THREE.Vector3; label: string }> = 
   'cellular-5g': { pos: new THREE.Vector3(120, 0, 280), label: 'phone in beam' },
   '6g-subthz': { pos: new THREE.Vector3(250, 0, 170), label: 'backhaul node' },
   'satcom-civil': { pos: new THREE.Vector3(-280, 0, -100), label: 'VSAT terminal' },
+  'satcom-leo': { pos: new THREE.Vector3(-15, 0, -120), label: 'flat-panel terminal' },
   'satcom-military': { pos: new THREE.Vector3(90, 0, -250), label: 'ground station' },
 };
 
@@ -150,6 +151,19 @@ export class Props {
     add(kiosk, RECEIVERS['6g-subthz'].pos);
     add(dish(emitterPos('satcom-civil'), RECEIVERS['satcom-civil'].pos), RECEIVERS['satcom-civil'].pos);
     add(dish(emitterPos('satcom-military'), RECEIVERS['satcom-military'].pos), RECEIVERS['satcom-military'].pos);
+    // LEO user terminal: a flat panel tilted at the sky, no dish.
+    const flatPanel = new THREE.Group();
+    const fpPost = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.2, 6, 8), standardMat(0x3a3f63));
+    fpPost.position.y = 3;
+    flatPanel.add(fpPost);
+    const fpPanel = new THREE.Mesh(
+      new THREE.BoxGeometry(10, 0.8, 7),
+      new THREE.MeshStandardMaterial({ color: 0xd8dcf0, emissive: 0x2b3050, roughness: 0.35 }),
+    );
+    fpPanel.position.y = 7;
+    fpPanel.rotation.x = -0.5; // tilted toward the passing satellites
+    flatPanel.add(fpPanel);
+    add(flatPanel, RECEIVERS['satcom-leo'].pos);
 
     // — City under the towers —
     this.group.add(cityBlocks(rng));
@@ -168,7 +182,7 @@ export class Props {
       this.group.add(line);
       // …with bright dots traveling down it.
       const dots: THREE.Mesh[] = [];
-      const isOrbital = id === 'satcom-civil' || id === 'satcom-military';
+      const isOrbital = id === 'satcom-civil' || id === 'satcom-leo' || id === 'satcom-military';
       const n = isOrbital ? 3 : 2;
       for (let i = 0; i < n; i++) {
         const dot = new THREE.Mesh(

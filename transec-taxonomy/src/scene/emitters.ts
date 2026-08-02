@@ -30,6 +30,7 @@ const POSITIONS: Record<BandId, [number, number, number]> = {
   'cellular-5g': [200, LAYER_HEIGHTS.cellular, 150],
   '6g-subthz': [268, LAYER_HEIGHTS.cellular - 6, 60],
   'satcom-civil': [-130, LAYER_HEIGHTS.geo, -150],
+  'satcom-leo': [30, LAYER_HEIGHTS.leo, -195],
   'satcom-military': [150, LAYER_HEIGHTS.geo, -120],
 };
 

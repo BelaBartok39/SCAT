@@ -73,9 +73,9 @@ export class SceneRoot {
     });
     this.emitters = buildEmitters(this.scene);
 
-    // The LEO shell IS the Starlink half of civil SATCOM: under a lens it
-    // takes that band's maturity color and dims when the cell is Weak, so
-    // the megaconstellation joins the band's story (and the TFS blackout).
+    // The LEO shell belongs to the civil-LEO band: under a lens it takes
+    // that band's maturity color and dims when the cell is Weak, so the
+    // megaconstellation joins the band's story (and the TFS blackout).
     // GNSS is scenery (no matrix row) and simply recedes under any lens.
     const leoDotMat = leoDots.material as THREE.PointsMaterial;
     const leoRingMat = leoRing.material as THREE.MeshBasicMaterial;
@@ -92,7 +92,7 @@ export class SceneRoot {
         leoRingMat.opacity = 0.22;
         return;
       }
-      const cell = cellFor(CELLS, 'satcom-civil', lensId);
+      const cell = cellFor(CELLS, 'satcom-leo', lensId);
       leoDotMat.color.set(MATURITY_SCENE_COLOR[cell.maturity]);
       leoDotMat.opacity = cell.maturity === 'W' ? 0.12 : 0.8;
       leoRingMat.opacity = cell.maturity === 'W' ? 0.05 : 0.25;

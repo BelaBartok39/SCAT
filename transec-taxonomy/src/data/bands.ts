@@ -529,14 +529,14 @@ export const BANDS: Band[] = [
     refIds: ['itu-m2160', 'itu-m2541', 'rappaport2019', 'ma2018'],
   },
 
-  // ——— 7. SATCOM — civil ————————————————————————————————————————————
+  // ——— 7. SATCOM — civil GEO ————————————————————————————————————————
   {
     id: 'satcom-civil',
-    name: 'Satellite Communications — civil',
-    shortName: 'SAT civ',
+    name: 'Satellite Communications — civil GEO',
+    shortName: 'SAT GEO',
     freqLowHz: 1e9,
     freqHighHz: 50e9,
-    tagline: 'L / S / C / X / Ku / Ka / Q-V · 160 km → 35,786 km',
+    tagline: 'L / S / C / X / Ku / Ka / Q-V · 35,786 km · broadcast & VSAT',
     sceneLayer: 'geo',
     physics: {
       frequencyRange: {
@@ -620,7 +620,108 @@ export const BANDS: Band[] = [
     refIds: ['etsi-dvbs2x', 'itu-p676', 'tedeschi2022', 'salim2025'],
   },
 
-  // ——— 8. SATCOM — military ————————————————————————————————————————
+  // ——— 8. SATCOM — civil LEO ————————————————————————————————————————
+  // Split from the civil row: the megaconstellation link is structurally
+  // different — fast-moving spacecraft, beam-hopped spot beams, phased-array
+  // terminals — and its TRANSEC story (broad downlink footprint, publicly
+  // characterized frames) deserves its own cells.
+  {
+    id: 'satcom-leo',
+    name: 'Satellite Communications — civil LEO',
+    shortName: 'SAT LEO',
+    freqLowHz: 10.7e9,
+    freqHighHz: 30e9,
+    tagline: 'Ku / Ka user links · 160–2,000 km · Starlink / OneWeb / Kuiper',
+    sceneLayer: 'leo',
+    physics: {
+      frequencyRange: {
+        summary:
+          'Megaconstellation broadband rides Ku- and Ka-band user links from satellites only a few hundred kilometres up, each visible for just minutes per pass.',
+        details: [
+          'Ku (10.7–14.5 GHz) and Ka (17.8–30 GHz) user and gateway links',
+          'LEO 160–2,000 km; Starlink ≈ 550 km',
+          'Passes last minutes → coverage needs hundreds to thousands of satellites',
+        ],
+      },
+      waveCharacteristics: {
+        summary:
+          'The satellite races across the sky, so the signal arrives with large, fast-changing Doppler — but travels far less distance than a GEO link, which is what makes small terminals and terrestrial-class latency possible.',
+        details: [
+          'Satellite moves ~7.6 km/s → large, fast-changing Doppler',
+          'Round-trip latency ~20–40 ms — terrestrial-class',
+          'Lowest free-space path loss of the orbit ladder',
+          'Low-elevation passes suffer atmospheric and blockage effects',
+        ],
+      },
+      modulationAccess: {
+        summary:
+          'The downlink paints small spot beams that hop between ground cells on a fixed schedule, and every user in the illuminated cell receives the same frames.',
+        details: [
+          'OFDM-family downlink with beam-hopped spot beams (Starlink)',
+          'Continuous handover between satellites and beams',
+          'Spot beam illuminates a ground cell far larger than one user',
+        ],
+      },
+      power: {
+        summary:
+          'The short path spares enough link budget that a pizza-box terminal with no dish can close the link, while the spacecraft budget stays solar-capped.',
+        details: [
+          'Low path loss → small flat-panel user terminals work',
+          'Spacecraft downlink capped by solar collection',
+          'Terminal EIRP concentrated by electronic beam steering',
+        ],
+      },
+      noiseInterference: {
+        summary:
+          'Thousands of satellites sharing spectrum make coordination the central problem, and the constellation must dodge both GEO arcs and each other.',
+        details: [
+          'Adjacent-satellite and NGSO/GSO coordination (ITU) at constellation scale',
+          'Thermal-noise-limited links; handover gaps',
+          'Uplink interference footprints sweep as satellites pass',
+        ],
+      },
+      antenna: {
+        summary:
+          'Both ends steer electronically: the terminal is a flat phased array tracking satellites across the sky, and the spacecraft forms many simultaneous spot beams.',
+        details: [
+          'Electronically steered flat-panel user terminal (no moving dish)',
+          'Multibeam phased arrays on the spacecraft reuse spectrum per cell',
+          'Terminal uplink is directional — but sweeps as it tracks',
+        ],
+      },
+      applications: {
+        summary:
+          'Consumer and enterprise broadband where fiber does not reach, plus maritime, aviation, IoT, and emerging direct-to-device service.',
+        details: [
+          'Broadband: Starlink, OneWeb, Kuiper',
+          'Maritime / aero / rural backhaul',
+          'Direct-to-device and IoT constellations emerging',
+        ],
+      },
+      benefitsLimitations: {
+        summary:
+          'Low orbit buys latency and link budget at the price of constellation scale — and the same spot beam that serves a whole cell exposes its frames to every receiver in it.',
+        details: [
+          '+ Terrestrial-class latency, global reach, small terminals',
+          '− Constellation size, Doppler and handover complexity',
+          '− Downlink footprint is receivable across the whole ground cell',
+        ],
+      },
+    },
+    refIds: [
+      'tedeschi2022',
+      'salim2025',
+      'humphreys2023',
+      'kozhaya2025',
+      'pavur2020',
+      'zhang2025',
+      'koisser2024',
+      'yue2023',
+      'itu-p676',
+    ],
+  },
+
+  // ——— 9. SATCOM — military ————————————————————————————————————————
   // No dedicated survey slide; assembled from the military fragments in
   // slides 8–9 of the survey deck and the corresponding taxonomy-deck lines.
   // Details are deliberately short where the source material is thin.

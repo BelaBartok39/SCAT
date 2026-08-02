@@ -17,6 +17,7 @@ export type BandId =
   | 'cellular-5g'
   | '6g-subthz'
   | 'satcom-civil'
+  | 'satcom-leo'
   | 'satcom-military';
 
 export type ObjectiveId = 'lpd' | 'lpi' | 'lpe' | 'aj' | 'tfs';
@@ -201,6 +202,7 @@ export const BAND_ORDER: BandId[] = [
   'cellular-5g',
   '6g-subthz',
   'satcom-civil',
+  'satcom-leo',
   'satcom-military',
 ];
 

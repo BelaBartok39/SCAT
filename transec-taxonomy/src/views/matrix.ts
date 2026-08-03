@@ -15,6 +15,10 @@ function bandName(id: BandId): string {
   return BANDS.find((b) => b.id === id)?.name ?? id;
 }
 
+function bandShort(id: BandId): string {
+  return BANDS.find((b) => b.id === id)?.shortName ?? id;
+}
+
 export function mountMatrix(container: HTMLElement, variant: 'matrix' | 'frontier'): void {
   const wrap = document.createElement('div');
   wrap.className = 'matrix-wrap';
@@ -44,7 +48,8 @@ export function mountMatrix(container: HTMLElement, variant: 'matrix' | 'frontie
         <span class="m-note">${c.note}</span>
       </button></td>`;
     }).join('');
-    return `<tr><th scope="row">${bandName(bid)}</th>${cells}</tr>`;
+    // Both name forms render; CSS swaps them at the compact breakpoint.
+    return `<tr><th scope="row"><span class="bn-full">${bandName(bid)}</span><span class="bn-short" aria-hidden="true">${bandShort(bid)}</span></th>${cells}</tr>`;
   }).join('');
 
   const legend = (['N', 'E', 'R', 'W'] as const)

@@ -117,6 +117,35 @@
 }
 .matrix-legend .chip { width: 14px; height: 14px; border-radius: 4px; }
 
+.bn-short { display: none; }
+
+/* ——— Compact heatmap (phones) ———
+   The grid's job at a glance is the SHAPE of the taxonomy; the note text
+   is detail that already lives one tap away in the cell modal. Dropping
+   notes lets the whole 9×5 matrix fit a phone screen with no scrolling —
+   a view of the full distribution that desktop can't even offer. */
+@media (max-width: 600px) {
+  .matrix-wrap { padding: 16px 8px 28px; }
+  .matrix-intro { margin-bottom: 12px; }
+  .matrix-intro h2 { font-size: 16px; }
+  .matrix-intro p { font-size: 12px; }
+  .matrix-table { border-spacing: 3px; }
+  .matrix-table th { padding: 4px 5px; font-size: 10px; }
+  .bn-full { display: none; }
+  .bn-short { display: inline; }
+  .matrix-cell {
+    width: 100%;
+    min-width: 42px;
+    min-height: 38px;
+    padding: 7px 0;
+    text-align: center;
+  }
+  .matrix-cell .m-note { display: none; }
+  .matrix-cell .m-badge { margin-bottom: 0; font-size: 11px; padding: 2px 9px; }
+  .matrix-legend { gap: 10px; margin-top: 12px; }
+  .matrix-legend .leg { font-size: 9.5px; }
+}
+
 /* Frontier positioning note: prior art vs. this taxonomy's contribution */
 .contribution-note {
   max-width: 780px;

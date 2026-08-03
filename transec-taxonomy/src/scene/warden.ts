@@ -180,12 +180,17 @@ export class Warden {
       </div>`;
     container.appendChild(this.panel);
 
-    // Collapse/expand.
+    // Collapse/expand. On small screens the expanded panel would bury the
+    // scene, so it starts collapsed there — one tap opens it.
     const headBtn = this.panel.querySelector<HTMLButtonElement>('.wp-head')!;
     headBtn.addEventListener('click', () => {
       const collapsed = this.panel.classList.toggle('collapsed');
       headBtn.setAttribute('aria-expanded', String(!collapsed));
     });
+    if (window.innerWidth < 700) {
+      this.panel.classList.add('collapsed');
+      headBtn.setAttribute('aria-expanded', 'false');
+    }
 
     // Presets.
     this.panel.querySelectorAll<HTMLButtonElement>('.wp-preset').forEach((btn) => {

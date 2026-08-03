@@ -110,3 +110,12 @@
   white-space: nowrap;
 }
 .ribbon-rail:hover .ribbon-readout { opacity: 1; }
+
+/* Phones: drop the regime captions (they need horizontal room to mean
+   anything) and tighten the rail; band chips stay tappable. */
+@media (max-width: 700px) {
+  .ribbon { left: 10px; right: 10px; bottom: 10px; }
+  .ribbon-regime { display: none; }
+  .ribbon-rail { height: 52px; }
+  .ribbon-seg { font-size: 8.5px; min-width: 22px; padding: 0 3px; }
+}

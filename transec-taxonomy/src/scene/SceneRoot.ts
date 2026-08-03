@@ -139,9 +139,18 @@ export class SceneRoot {
     });
 
     // — Picking —
+    // The click path must compute its own hit from the event coordinates:
+    // touch devices fire no pointermove before a tap, so any logic that
+    // relies on hover state silently never opens anything on a phone.
     const dom = this.renderer.domElement;
     dom.addEventListener('pointermove', (e) => this.onPointerMove(e));
-    dom.addEventListener('click', () => {
+    let downAt = { x: 0, y: 0 };
+    dom.addEventListener('pointerdown', (e) => { downAt = { x: e.clientX, y: e.clientY }; });
+    dom.addEventListener('click', (e) => {
+      // A drag that ends over a node is camera movement, not a selection.
+      if (Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) > 8) return;
+      this.onPointerMove(e as PointerEvent);
+      this.pick();
       if (this.hovered) setState({ selectedBand: this.hovered.band.id, selectedCell: null });
     });
 
@@ -189,10 +198,12 @@ export class SceneRoot {
 
   private pick(): void {
     this.raycaster.setFromCamera(this.pointer, this.camera);
-    const cores = this.emitters.map((h) => h.core);
-    const hits = this.raycaster.intersectObjects(cores, false);
+    // Labels are pickable too — on touch screens the label card is the
+    // natural tap target, not the small core mesh.
+    const targets = this.emitters.flatMap((h) => [h.core, h.label]);
+    const hits = this.raycaster.intersectObjects(targets, false);
     const hit = hits.length
-      ? this.emitters.find((h) => h.core === hits[0]!.object) ?? null
+      ? this.emitters.find((h) => h.core === hits[0]!.object || h.label === hits[0]!.object) ?? null
       : null;
     if (hit !== this.hovered) {
       const setScale = (h: EmitterHandle, f: number) => {

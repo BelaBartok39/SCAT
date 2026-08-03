@@ -17,7 +17,10 @@
 
 .modal-panel {
   width: min(880px, calc(100vw - 48px));
+  /* dvh tracks the REAL visible viewport on iOS (100vh hides behind
+     Safari's toolbars); vh line stays as the older-browser fallback. */
   max-height: calc(100vh - 80px);
+  max-height: calc(100dvh - 60px);
   display: flex;
   flex-direction: column;
   background: rgba(12, 12, 26, 0.97);
@@ -34,6 +37,7 @@
   align-items: flex-start;
   justify-content: space-between;
   padding: 20px 24px 0;
+  flex-shrink: 0; /* only the scrollable body may give up height */
 }
 .modal-title { font-size: 20px; font-weight: 800; }
 .modal-tagline {
@@ -60,6 +64,7 @@
   gap: 2px;
   padding: 14px 24px 0;
   border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
 }
 
 @media (max-width: 480px) {

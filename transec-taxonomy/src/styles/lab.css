@@ -96,6 +96,7 @@
 .lab-shell {
   width: min(1080px, calc(100vw - 40px));
   max-height: calc(100vh - 60px);
+  max-height: calc(100dvh - 40px);
   display: flex;
   flex-direction: column;
   background: rgba(10, 10, 22, 0.98);
@@ -109,6 +110,7 @@
   justify-content: space-between;
   padding: 18px 22px 12px;
   border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
 }
 .lab-title { font-size: 18px; font-weight: 800; }
 .lab-sub {

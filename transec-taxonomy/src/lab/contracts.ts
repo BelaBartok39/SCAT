@@ -92,8 +92,17 @@ export interface TimeFreqInput {
   /**
    * Waterfall rows, newest last. Each row is a PSD in dB (uniform length).
    * The view scrolls; callers append rows across frames.
+   *
+   * NOTE: this is a rolling window — its length plateaus once the buffer
+   * is full, so it can NOT be used to detect new rows. Use `seq`.
    */
   rows: Float64Array[];
+  /**
+   * Total rows ever produced, monotonically increasing. The view diffs
+   * this against its own progress to know how far to scroll. A decrease
+   * (e.g. a restart resetting it to 0) triggers a full repaint.
+   */
+  seq?: number;
   dbMin: number;
   dbMax: number;
   /** Optional channel-index overlay per row (hop trajectory dots). */

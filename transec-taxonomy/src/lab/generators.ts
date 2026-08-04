@@ -127,12 +127,20 @@ function bitsPer(kind: ConstellationKind): number {
   return map[kind] ?? 2;
 }
 
-/** Rolling waterfall helper: keeps N rows, appends per frame. */
+/**
+ * Rolling waterfall helper: keeps the last N rows, appends one per frame.
+ *
+ * `seq` counts rows ever produced. The view needs it because `rows.length`
+ * plateaus once the window is full, which would otherwise read as "nothing
+ * new" and freeze the scroll after N frames.
+ */
 class Waterfall {
   rows: Float64Array[] = [];
-  constructor(private max = 90) {}
+  seq = 0;
+  constructor(private max = 240) {}
   push(row: Float64Array): Float64Array[] {
     this.rows.push(row);
+    this.seq++;
     if (this.rows.length > this.max) this.rows.shift();
     return this.rows;
   }
@@ -207,6 +215,7 @@ export function createGenerator(scheme: ModulationScheme): Generator {
             },
             timeFreq: {
               rows,
+              seq: wf.seq,
               dbMin: DB_MIN,
               dbMax: DB_MAX,
               hopChannels: Uint16Array.from(hops),
@@ -330,7 +339,7 @@ export function createGenerator(scheme: ModulationScheme): Generator {
           const rows = wf.push(psd);
           return {
             spectrum: { psd, dbMin: DB_MIN, dbMax: DB_MAX, label: `CP-OFDM · ${spacing} kHz spacing · ${used} subcarriers` },
-            timeFreq: { rows, dbMin: DB_MIN, dbMax: DB_MAX, label: 'resource grid over time' },
+            timeFreq: { rows, seq: wf.seq, dbMin: DB_MIN, dbMax: DB_MAX, label: 'resource grid over time' },
           };
         },
       };
@@ -358,7 +367,7 @@ export function createGenerator(scheme: ModulationScheme): Generator {
           const rows = wf.push(row);
           const iq = ofdmWaveform(FFT_SIZE, 48, 'qpsk', rng);
           return {
-            timeFreq: { rows, dbMin: DB_MIN, dbMax: DB_MAX, label: 'delay-Doppler grid (OTFS)' },
+            timeFreq: { rows, seq: wf.seq, dbMin: DB_MIN, dbMax: DB_MAX, label: 'delay-Doppler grid (OTFS)' },
             spectrum: { psd: psdOf(iq), dbMin: DB_MIN, dbMax: DB_MAX, label: 'equivalent TF occupancy' },
           };
         },
@@ -392,7 +401,7 @@ export function createGenerator(scheme: ModulationScheme): Generator {
           const rows = wf.push(row);
           return {
             spectrum: { psd, dbMin: DB_MIN, dbMax: DB_MAX, label: 'OFDM downlink — one spot-beam dwell' },
-            timeFreq: { rows, dbMin: DB_MIN, dbMax: DB_MAX, label: 'beam-hop schedule across ground cells' },
+            timeFreq: { rows, seq: wf.seq, dbMin: DB_MIN, dbMax: DB_MAX, label: 'beam-hop schedule across ground cells' },
           };
         },
       };
@@ -445,6 +454,7 @@ export function createGenerator(scheme: ModulationScheme): Generator {
           return {
             timeFreq: {
               rows,
+              seq: wf.seq,
               dbMin: DB_MIN,
               dbMax: DB_MAX,
               hopChannels: Uint16Array.from(hops),

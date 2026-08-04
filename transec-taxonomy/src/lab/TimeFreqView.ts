@@ -150,11 +150,18 @@ export class TimeFreqView implements LabView<TimeFreqInput> {
   /** Scroll the offscreen history and paint whatever rows are new. */
   private paintRows(input: TimeFreqInput): void {
     const { octx, devW, devH } = this;
-    const total = input.rows.length;
+    // Progress must come from `seq` (rows ever produced), not rows.length:
+    // the caller's buffer is a rolling window whose length plateaus, which
+    // would read as "no new rows" and freeze the scroll permanently.
+    const total = input.seq ?? input.rows.length;
     const newRows = total - this.painted;
 
+    // Available history in the caller's rolling buffer. If more rows were
+    // produced than the buffer still holds (long pause off-screen), the
+    // missing ones are unrecoverable — repaint from what we have.
+    const avail = input.rows.length;
     // Caller reset (or rewound) the buffer: start over.
-    const full = newRows < 0 || newRows >= this.maxRows;
+    const full = newRows < 0 || newRows >= this.maxRows || newRows > avail;
     if (full) {
       octx.setTransform(1, 0, 0, 1, 0, 0);
       octx.fillStyle = `rgba(${BG_RGB}, 1)`;
@@ -168,9 +175,10 @@ export class TimeFreqView implements LabView<TimeFreqInput> {
       octx.globalCompositeOperation = 'source-over';
     }
 
-    const count = full ? Math.min(total, this.maxRows) : newRows;
+    const count = Math.min(full ? this.maxRows : newRows, avail);
     for (let k = 0; k < count; k++) {
-      const idx = total - count + k;
+      // Newest `count` rows sit at the END of the rolling buffer.
+      const idx = avail - count + k;
       const row = input.rows[idx];
       const y = devH - (count - k) * ROW_H;
       if (row && row.length > 0) this.paintScanline(row, input.dbMin, input.dbMax, y);

@@ -261,8 +261,11 @@ export class TimeFreqView implements LabView<TimeFreqInput> {
     if (!hopChannels || !channelCount || channelCount <= 0) return;
 
     const { ctx, cssW, dpr, devH } = this;
-    const visible = Math.min(rows.length, this.maxRows);
-    const total = rows.length;
+    // Index off the hop array's own length, not the row count: the two are
+    // independent rolling buffers, and assuming equal lengths silently
+    // shifts the whole trajectory when they differ.
+    const visible = Math.min(hopChannels.length, rows.length, this.maxRows);
+    const total = hopChannels.length;
     const r = 1.6;
 
     ctx.fillStyle = THEME.warn;

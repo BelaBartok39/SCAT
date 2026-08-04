@@ -134,10 +134,12 @@ function bitsPer(kind: ConstellationKind): number {
  * plateaus once the window is full, which would otherwise read as "nothing
  * new" and freeze the scroll after N frames.
  */
+const WATERFALL_ROWS = 240;
+
 class Waterfall {
   rows: Float64Array[] = [];
   seq = 0;
-  constructor(private max = 240) {}
+  constructor(private max = WATERFALL_ROWS) {}
   push(row: Float64Array): Float64Array[] {
     this.rows.push(row);
     this.seq++;
@@ -204,7 +206,9 @@ export function createGenerator(scheme: ModulationScheme): Generator {
           const rx = Channel.awgn(symbols, p.snrDb ?? 18, rng);
           const ch = pattern.channels[hopIdx++ % pattern.channels.length]!;
           hops.push(ch);
-          if (hops.length > 90) hops.shift();
+          // Must track the waterfall window: the overlay pairs hops with
+          // rows, so a shorter history leaves newer rows without dots.
+          if (hops.length > WATERFALL_ROWS) hops.shift();
           const rows = wf.push(hopRow(ch, pattern.channelCount, rng));
           return {
             constellation: {
@@ -443,7 +447,9 @@ export function createGenerator(scheme: ModulationScheme): Generator {
         next(): LabFrame {
           const ch = pattern.channels[hopIdx++ % pattern.channels.length]!;
           hops.push(ch);
-          if (hops.length > 90) hops.shift();
+          // Must track the waterfall window: the overlay pairs hops with
+          // rows, so a shorter history leaves newer rows without dots.
+          if (hops.length > WATERFALL_ROWS) hops.shift();
           // Spread energy: barely above the floor.
           const rows = wf.push(hopRow(ch, pattern.channelCount, rng, -14));
           const sf = Math.max(8, Math.round(p.spreadFactor ?? 64));

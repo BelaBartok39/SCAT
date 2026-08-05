@@ -29,15 +29,32 @@ What exists:
 
 ## The goal we are working toward
 
-An **interactive tool accompanying a published paper about the tool itself**, focused on
-**space communications**, extending the TRANSEC work with an **attack + mitigation layer**
-concentrated on SATCOM.
+*Revised 2026-08-05 after advisor discussion. This supersedes the earlier "successor tool"
+framing — the scope grew substantially.*
 
-The contribution claim is **the crossing**, not the axes:
-link direction × PHY-layer TRANSEC objectives × orbit regime. Prior art covers the axes
-separately — SPARTA splits uplink/downlink intercept, Tedeschi carries a link column,
-Ben Yahia decomposes the link segment — but nobody crosses them with physical-layer
-security objectives, and all of it is orbit-agnostic.
+A **comprehensive RF signal security taxonomy** delivered as one interactive tool with
+**four views**, accompanying a published paper about the tool itself.
+
+| # | View | Status |
+|---|---|---|
+| 1 | **TRANSEC diorama** — the shipped ground-to-orbit scene | complete as a standalone; see caveats below |
+| 2 | **COMSEC diorama** — device-level scene; clicking an attack lights a kill chain through the equipment | not started |
+| 3 | **Signal Lab** — expanded modulation library, first-class top-level view | partially built (6 primitives, 10 schemes) |
+| 4 | **Home** — the main view; facet × facet matrix wrapped into a rotatable cylinder | not started |
+
+**View 4 is the centerpiece and the landing view.** The other three are drill-downs from it.
+It is called **"Home"** in the UI — "the cylinder" is internal design vocabulary only.
+
+### "TRANSEC is done" — with three caveats
+
+It is finished as a *standalone app*. As *view 1 of 4* it still needs:
+
+1. Its data migrated into the shared entity schema (it becomes the Band × Objective tile).
+2. The theme / readability work (below), still outstanding.
+3. **A decision on the SPACECOM expansion.** Decisions 2, 5, 6 and 7 below — link direction,
+   GNSS civil/military rows, ISL, optical — were the whole of the planned expansion and were
+   the paper's contribution claim as of a week ago. If the TRANSEC view is frozen, those must
+   either become facets/values in the cylinder or be explicitly dropped. **Unresolved.**
 
 **Target venue: IEEE VizSec** (visualization for cyber security; publishes tool papers
 and expects evaluation). Alternates: IEEE Aerospace, Computers & Security tools track.
@@ -48,10 +65,15 @@ and expects evaluation). Alternates: IEEE Aerospace, Computers & Security tools 
 
 ### Scope
 
-1. **COMSEC stays out of scope.** Two reasons: SPARTA already covers upper layers, so
-   there is no novelty there; and merging COMSEC into the cells dissolves the central
-   finding (civil systems read Weak *because* they delegate upward). A layer-ablation
-   model was considered and rejected for exactly this reason.
+1. ~~**COMSEC stays out of scope.**~~ **REVERSED 2026-08-05.** COMSEC returns as **view 2**,
+   a device-level diorama where clicking an attack lights a kill chain through the equipment.
+   The reversal holds because the thing being added is not the thing that was rejected:
+   COMSEC was rejected as *a column in the matrix*, where it duplicated SPARTA and dissolved
+   the central finding (civil systems read Weak *because* they delegate upward). It returns as
+   *a kill chain propagating through concrete hardware* — SPARTA enumerates TTPs but never
+   shows them moving through real equipment. **The visualization is the contribution, not the
+   COMSEC taxonomy.** Keep this distinction on record; the objection will resurface.
+   The original rejection still stands for the matrix: COMSEC does **not** become a cell axis.
 2. **The new axis is link direction**, not protocol layer:
    `uplink | downlink | isl | bidirectional`.
    The supported finding: **uplink is LPD + AJ dominant** (Koisser 2024 — terminal
@@ -98,7 +120,10 @@ and expects evaluation). Alternates: IEEE Aerospace, Computers & Security tools 
     same component with a different filter, and nav is getting crowded.
 11. **Signal Lab becomes a first-class top-level view** (it is currently only reachable via
     a band modal tab or a deep link). With 25–40 schemes it needs its own browsing surface.
-12. Nav becomes: **Scene · Matrix · Signal Lab · About**.
+12. ~~Nav becomes: **Scene · Matrix · Signal Lab · About**.~~ **REVISED 2026-08-05.**
+    Nav becomes the four views: **Home · TRANSEC · COMSEC · Signal Lab** (+ About).
+    **The cylinder view is labelled "Home"** in the UI and is the landing view; "cylinder"
+    is internal/design vocabulary only, and should not appear in nav or user-facing copy.
 
 ### Presentation
 
@@ -110,6 +135,147 @@ and expects evaluation). Alternates: IEEE Aerospace, Computers & Security tools 
     onto eclipse geometry: HIDDEN = umbra, ENERGY ONLY = penumbra, EXPOSED = full
     illumination. The tool's subject is the partial-concealment zone.
     No backronym; use "Name: descriptive subtitle" as tool papers conventionally do.
+
+---
+
+## Home view — the cylinder
+
+*Design settled 2026-08-05. Source: hand sketch, `.claude/image-cache/.../18.png`.*
+
+### What it is
+
+**An N² chart: both axes are the same facet list.** Every cell is a *relation between two
+facet types*, and the whole surface is an adjacency matrix over one entity graph. This is
+not a bigger version of the 9×5 matrix — it is a different kind of object.
+
+Facets (from the sketch, plus one addition):
+
+`Protocol · Band · Modulation · Antenna · Physical/propagation · Noise · Attack ·
+Mitigation · Limitation · Use-case` — **plus `Objective`** (LPD/LPI/LPE/AJ/TFS), which is
+missing from the sketch and is what the existing contribution claim rests on.
+
+**The unification: the shipped TRANSEC matrix is the `Band × Objective` tile.** Already
+authored, already cited. The paper gets to say *here is the frame, and here is one cell of
+it worked out in full depth as an existence proof.* The published work is located inside
+the new work, not superseded by it.
+
+### Authoring load
+
+11 facets → 121 tiles, minus the diagonal, halved for symmetry ≈ **55 unique relation-types.**
+
+`(Antenna, Protocol)` and `(Protocol, Antenna)` are the same relation read from two ends.
+**Author once, derive the transpose.** Users may enter from either facet; that redundancy is
+a feature. Do *not* use the two triangles for different semantics (the classic N² forward/
+feedback convention) — it doubles the load and asks users to learn a convention.
+
+### Why a cylinder is justified
+
+Wrapping is only legitimate if the wrapped axis is genuinely **cyclic**. Here it is:
+
+> Protocol → Band → Modulation → Attack → Mitigation → Limitation → *back into* Protocol
+
+That is the countermeasure loop — limitations of a mitigation drive the next protocol
+generation. Committing to this ordering deliberately makes the cylinder an **argument**
+rather than a skin: there is no origin column, no final column, and reading all the way
+around returns you to where you started. The arms-race framing is normally asserted in prose
+and never shown. **If this ordering cannot be defended, the cylinder is decoration and should
+be dropped.**
+
+**Ship an unroll.** Same data, same cells, one control, animated: cylinder for orientation and
+navigation, flat grid for work. The transition is the paper's headline figure and it defuses
+the obvious reviewer objection before it is raised.
+
+### Interaction
+
+- **No text inside cells.** Click a cell → modal for that crossing. This removes the glyph-
+  warping objection to a curved surface entirely.
+- **Fixed left gutter for row labels.** Rows are horizontal bands; they do not rotate away.
+- **Rim labels for columns**, rotating with the cylinder but **billboarded to the camera** so
+  they never render mirrored or edge-on. Fade past roughly ±60° from front.
+- **Crosshair + fixed readout.** On hover/focus, light the full row band and column stripe and
+  print the pair name ("Antenna × Protocol") in a fixed position that never moves. One label,
+  always the same place, always horizontal.
+  This matters more on a cylinder than on a grid: **curvature actively degrades header-tracing**,
+  because column lines converge toward the silhouette. The fixed readout sidesteps the task
+  rather than fighting it.
+
+### Colour — decided, with the rejected alternative recorded
+
+**Rejected: encoding cell identity as a blend of row colour × column colour.**
+Three reasons, recorded so this does not resurface:
+
+1. **Mixes cannot be inverted.** Nobody sees green and recovers "blue + yellow" — that is not
+   an operation vision performs, and shaded curvature shifts apparent hue on top of it.
+2. **The counting fails.** Categorical colour tops out around 8–12 *distinct* hues; this needs
+   121 distinguishable blends from 11 × 11 parents that must themselves be distinguishable.
+   Those requirements fight each other, and ~8% of men have no fallback.
+3. **It spends the only free channel.** Position already gives row and column. Encoding identity
+   again in colour buys nothing and burns the one channel that could carry what position cannot.
+
+**The decisive argument** is information scent: with no cell text and identity-only colour,
+121 cells look equally featureless and exploration is a guessing game. Users click a few, find
+them uneven, and stop.
+
+**Adopted:**
+
+- **Row bands: a subtle hue tint by facet family** — ~6 groups, not 11 (structural / signal /
+  adversarial / …). Gives "which neighbourhood am I in" while rotating, at a count perception
+  can hold.
+- **Cells: a single sequential ramp for evidence density** — how well-covered that relation is
+  by the literature and by our dataset.
+
+Two channels, one job each: hue orients, lightness tells you where to click. A single sequential
+ramp also survives colour-vision deficiency and greyscale print, which matters once figures are
+being pulled for the paper.
+
+**The payoff:** cell colour makes the whole surface a **research-gap map**. Empty regions become
+a finding rather than an embarrassment — "here is what nobody has studied" is a stronger
+contribution than "here is what everyone knows."
+
+---
+
+## External data sources
+
+**Rule: snapshot, never live-fetch.** An offline ingest pipeline pulls each source, normalises it,
+and commits versioned JSON with per-record provenance and a retrieval date. Three reasons, in
+priority order: a reviewer must be able to re-run the build and get the same matrix; live fetch
+breaks a static Pages deploy on CORS, rate limits and outages; licensing attribution stays
+auditable in the repo.
+
+Realistically usable:
+
+| Source | Licence | Feeds |
+|---|---|---|
+| MITRE ATT&CK | CC BY 4.0, STIX bundles | Attack facet |
+| CAPEC / CWE | MITRE, attribution | Attack facet — maps better than ATT&CK |
+| 3GPP specs | — | Modulation, Band |
+| ITU-R / FCC allocation tables | public | Band |
+| **SPARTA** | Aerospace Corp — **check terms** | cross-reference IDs only |
+
+**SPARTA needs care on two axes.** Legally: cite technique IDs and link out, author original
+descriptions, do not mirror their text. Semantically — and this is the bigger risk — **SPARTA is
+mission- and spacecraft-level; we are PHY- and signal-level.** Most SPARTA techniques have no
+RF-signal correlate. An automated ingest will produce plausible-looking garbage, which is worse
+than a gap because it is invisible.
+
+Do it as a **hand-curated crosswalk** — and note that the crosswalk is itself publishable:
+*mapping mission-level space TTPs to physical-layer signal facets* is a table nobody has
+produced, and it is the natural bridge between this work and the community's established
+reference.
+
+---
+
+## Sequencing
+
+**All four views are projections of one entity graph, so the data layer is the whole project.**
+
+1. Schema + ingest first.
+2. Migrate the existing 45 cells into it (they become the Band × Objective tile).
+3. Then build surfaces.
+
+**One app, four routes, shared store.** If these are separate apps the cross-linking dies, and
+cross-linking is the entire value proposition: clicking a cell should jump to the diorama with
+that kill chain lit, and to the lab with that modulation loaded.
 
 ---
 
@@ -352,7 +518,19 @@ the build.
   linking out is almost certainly fine; mirroring descriptions may not be. **Author original
   descriptions and cite SPARTA IDs as cross-references.** Check their terms before
   committing to it as a spine.
-- **Is this a second paper or the same paper's second half?**
+- **Is this a second paper or the same paper's second half?** Sharper now that scope has grown:
+  a *framework paper with a tool* and a *tool paper with a framework* want different builds and
+  different venues. There is a real case for the shipped TRANSEC work being paper one and the
+  four-view tool being paper two.
+- **Where does the SPACECOM expansion go?** Decisions 2, 5, 6, 7 (link direction, GNSS
+  civil/military, ISL, optical) predate the four-view architecture. Either they become facet
+  values in the cylinder, or they land in the TRANSEC view after all, or they are dropped.
+  Currently homeless. **Highest-priority open question.**
+- **Does `Objective` really become the 11th facet?** It is absent from the sketch. If yes, the
+  cylinder subsumes the shipped matrix; if no, TRANSEC stays a peer view sitting beside it.
+  This one choice decides the relationship between the published work and the new work.
+- **Can the cyclic column ordering be defended?** The cylinder's justification rests entirely
+  on it. Worth pressure-testing with the advisor before any 3D work starts.
 - **Does ISL get a full row set or a partial one?** It is the least-studied direction in the
   literature, which makes it either the best frontier claim or a distraction.
 - **Repo strategy** — new branch off `transec-taxonomy`; decide whether the successor is a

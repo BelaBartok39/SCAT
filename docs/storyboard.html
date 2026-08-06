@@ -621,6 +621,17 @@
           <pattern id="void" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
             <line x1="0" y1="0" x2="0" y2="6" stroke="var(--line-2)" stroke-width="1"/>
           </pattern>
+          <!-- Focus ramp for the far wall's labels: legible only once a column
+               has rotated to the front. Bucketed, so 11 labels share 3 filters. -->
+          <filter id="fz3" x="-40%" y="-80%" width="180%" height="260%">
+            <feGaussianBlur stdDeviation="2.6"/>
+          </filter>
+          <filter id="fz2" x="-40%" y="-80%" width="180%" height="260%">
+            <feGaussianBlur stdDeviation="1.4"/>
+          </filter>
+          <filter id="fz1" x="-40%" y="-80%" width="180%" height="260%">
+            <feGaussianBlur stdDeviation="0.6"/>
+          </filter>
         </defs>
         <g id="cyl-cells"></g>
         <g id="cyl-rowlabels"></g>
@@ -638,12 +649,15 @@
     <ol class="callouts">
       <li><span class="cn">1</span><div><b>No text in cells.</b> Click opens a modal. This removes the glyph-warping objection to a curved surface entirely.</div></li>
       <li><span class="cn">2</span><div><b>Crosshair + fixed readout.</b> Curvature actively degrades header-tracing — column lines converge at the silhouette — so the readout sidesteps the task instead of fighting it.</div></li>
-      <li><span class="cn">3</span><div><b>Hue = facet family</b> (six groups, not eleven). Orientation while rotating, at a count perception can hold.</div></li>
-      <li><span class="cn">4</span><div><b>Lightness = evidence density.</b> The one thing position cannot tell you, and it makes the surface a research-gap map.</div></li>
-      <li><span class="cn">5</span><div><b>The bright tile is Band × Objective</b> — the shipped 45-cell matrix, already authored and cited. The published work sits inside the new work.</div></li>
-      <li><span class="cn">6</span><div><b>The diagonal is excluded</b>, hatched. A facet crossed with itself is a glossary entry, not a relation.</div></li>
-      <li><span class="cn">7</span><div><b>Unroll to a flat grid</b> — same data, same cells, one control. Cylinder to orient, grid to work. <em>This transition is the paper's headline figure.</em></div></li>
-      <li><span class="cn">8</span><div><b>Camera tilt is a readability constraint, not a taste call.</b> Row labels sit at the silhouette; the front face — where the eye lands — sits lower by the tilt. The first build of this sheet used a steeper tilt and read <em>one row wrong</em>. Keep the offset under one row height.</div></li>
+      <li><span class="cn">3</span><div><b>The far wall stays drawn</b>, dimmed to roughly a tenth, with the rim ellipses behind it. Without it the shape reads as a curved sheet; with it, as a closed barrel being turned.</div></li>
+      <li><span class="cn">4</span><div><b>Far labels are present but out of focus</b> — every column keeps its name all the way round, blur and opacity ramping with depth, resolving only as it turns to the front. Nothing is ever hidden, only deferred.</div></li>
+      <li><span class="cn">5</span><div><b>A lit row closes into a ring.</b> Highlighting lifts the far wall too, so the band is visibly continuous around the barrel. <em>This is the cyclic-axis argument made visible rather than asserted.</em></div></li>
+      <li><span class="cn">6</span><div><b>Hue = facet family</b> (six groups, not eleven). Orientation while rotating, at a count perception can hold.</div></li>
+      <li><span class="cn">7</span><div><b>Lightness = evidence density.</b> The one thing position cannot tell you, and it makes the surface a research-gap map.</div></li>
+      <li><span class="cn">8</span><div><b>The bright tile is Band × Objective</b> — the shipped 45-cell matrix, already authored and cited. The published work sits inside the new work.</div></li>
+      <li><span class="cn">9</span><div><b>The diagonal is excluded</b>, hatched. A facet crossed with itself is a glossary entry, not a relation.</div></li>
+      <li><span class="cn">10</span><div><b>Unroll to a flat grid</b> — same data, same cells, one control. Cylinder to orient, grid to work. <em>This transition is the paper's headline figure.</em></div></li>
+      <li><span class="cn">11</span><div><b>Camera tilt is a readability constraint, not a taste call.</b> Row labels sit at the silhouette; the front face — where the eye lands — sits lower by the tilt. The first build of this sheet used a steeper tilt and read <em>one row wrong</em>. Keep the offset under one row height.</div></li>
     </ol>
   </section>
 
@@ -1092,7 +1106,7 @@
   // the eye actually lands). At RY=52 that gap was ~1.7 rows and the drawing read
   // one row wrong. Under one row is the constraint.
   var CX = 480, RX = 290, RY = 26;
-  var Y_LABEL_RING = 76, Y_TOP = 122, ROW_H = 32;
+  var Y_LABEL_RING = 60, Y_TOP = 122, ROW_H = 32;
   var FLAT_L = 190, FLAT_W = 580;
   var STEP = (Math.PI * 2) / N;
 
@@ -1169,15 +1183,35 @@
 
     var lit = hoverRow >= 0 || hoverCol >= 0;
 
+    // Rim ellipses, drawn behind everything. The front arc is covered by the
+    // cells; what survives is the back arc curving the opposite way, which is
+    // what makes the shape read as a closed barrel rather than a curved sheet.
+    var rimOp = (1 - smooth(0.05, 0.55, t)) * 0.5;
+    if (rimOp > 0.01) {
+      [Y_TOP, Y_TOP + N * ROW_H].forEach(function (ry0) {
+        gCell.appendChild(el("ellipse", {
+          cx: CX, cy: ry0, rx: RX, ry: RY,
+          fill: "none", stroke: "var(--line-2)", "stroke-width": 1,
+          "stroke-opacity": rimOp.toFixed(3)
+        }));
+      });
+    }
+
     for (var oi = 0; oi < order.length; oi++) {
       var col = order[oi].c, depth = order[oi].d;
-      if (depth <= 0.02 && t < 0.02) continue;           // back half is hidden on the cylinder
+      var isBack = depth <= 0.02;
 
       var th = rot + col * STEP, a1 = th - STEP / 2, a2 = th + STEP / 2;
-      var faceAlpha = depth > 0
-        ? 0.3 + 0.7 * Math.min(1, depth / 0.42)
-        : t * t;
-      if (t > 0) faceAlpha = faceAlpha + (1 - faceAlpha) * t;
+      var faceAlpha;
+      if (isBack) {
+        // The far wall. Dim enough to sit clearly behind the near wall, but
+        // present — it is what sells a full cylinder turning.
+        faceAlpha = 0.09 + 0.11 * (1 + depth);
+        faceAlpha += (1 - faceAlpha) * t * t;
+      } else {
+        faceAlpha = 0.3 + 0.7 * Math.min(1, depth / 0.42);
+        if (t > 0) faceAlpha = faceAlpha + (1 - faceAlpha) * t;
+      }
 
       for (var row = 0; row < N; row++) {
         var yT = Y_TOP + row * ROW_H, yB = yT + ROW_H;
@@ -1194,18 +1228,25 @@
 
         var onCross = (row === hoverRow || col === hoverCol);
         var isDiag  = row === col;
-        var alpha   = faceAlpha * (lit && !onCross ? 0.22 : 1);
+
+        var alpha = faceAlpha;
+        if (lit) {
+          // Lifting the far wall of a lit row shows the band closing into a
+          // ring — the clearest statement that the axis wraps.
+          alpha = onCross ? (isBack ? faceAlpha * 2.6 : faceAlpha) : faceAlpha * 0.22;
+        }
+        alpha = Math.min(1, alpha);
 
         var path = el("path", {
           d: d,
           fill: isDiag ? "url(#void)" : cellFill(FACETS[row].fam, EV[row][col]),
           "fill-opacity": alpha.toFixed(3),
           stroke: onCross && !isDiag ? "var(--accent)" : "var(--line)",
-          "stroke-width": onCross && !isDiag ? 1.4 : 0.6,
-          "stroke-opacity": alpha.toFixed(3)
+          "stroke-width": onCross && !isDiag ? (isBack ? 0.8 : 1.4) : 0.6,
+          "stroke-opacity": (isBack ? alpha * 0.8 : alpha).toFixed(3)
         });
 
-        if (!isDiag) {
+        if (!isDiag && !isBack) {
           path.style.cursor = "pointer";
           (function (r, cc) {
             path.addEventListener("pointerenter", function () {
@@ -1214,6 +1255,8 @@
             });
             path.addEventListener("click", function (e) { e.stopPropagation(); openModal(r, cc); });
           }(row, col));
+        } else {
+          path.style.pointerEvents = "none";
         }
         gCell.appendChild(path);
       }
@@ -1244,14 +1287,22 @@
     var flatOp = smooth(0.45, 0.85, t);
     for (c = 0; c < N; c++) {
       var thc = rot + c * STEP, dep = Math.cos(thc), onc = c === hoverCol;
-      if (cylOp > 0.01 && dep > 0.16) {
+      if (cylOp > 0.01) {
+        // Every column keeps a label, all the way round the far side. Focus and
+        // opacity ramp with depth, so a name is present but unreadable until it
+        // has turned to the front.
         var lp = px(thc, Y_LABEL_RING, RANK[c], 0.5);
-        var op = Math.min(1, (dep - 0.16) / 0.3) * cylOp;
-        var t1 = el("text", {
+        var f = Math.min(1, Math.max(0, (dep + 0.3) / 1.15));
+        var op = (0.13 + 0.87 * Math.pow(f, 1.7)) * cylOp;
+        var blur = f > 0.86 ? null : f > 0.62 ? "fz1" : f > 0.34 ? "fz2" : "fz3";
+        var attrs = {
           x: lp[0].toFixed(1), y: lp[1].toFixed(1), "text-anchor": "middle",
           "font-family": "var(--font-mono)", "font-size": "11",
-          fill: onc ? "var(--accent)" : "var(--ink-2)", "fill-opacity": op.toFixed(2)
-        });
+          fill: onc && dep > 0.16 ? "var(--accent)" : "var(--ink-2)",
+          "fill-opacity": op.toFixed(3)
+        };
+        if (blur) attrs.filter = "url(#" + blur + ")";
+        var t1 = el("text", attrs);
         t1.textContent = FACETS[c].label;
         gCol.appendChild(t1);
       }

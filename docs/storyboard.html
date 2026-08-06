@@ -1,0 +1,1428 @@
+<title>RF Signal Security Taxonomy — Product Schematic</title>
+
+<style>
+  :root {
+    --bg:        #f4f5f8;
+    --surface:   #ffffff;
+    --surface-2: #e9ecf2;
+    --line:      rgba(20, 26, 48, .16);
+    --line-2:    rgba(20, 26, 48, .32);
+    --ink:       #12141c;
+    --ink-2:     #414859;
+    --ink-3:     #6b7383;
+    --accent:    #0e7490;
+    --warn:      #b45309;
+    --good:      #047857;
+    --crit:      #be123c;
+    --violet:    #6d28d9;
+    --hatch:     rgba(20, 26, 48, .10);
+    --shadow:    0 1px 2px rgba(16, 22, 44, .06), 0 8px 24px rgba(16, 22, 44, .05);
+    --font-ui:   system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:        #07070f;
+      --surface:   #0e0f1a;
+      --surface-2: #171a28;
+      --line:      rgba(150, 165, 220, .18);
+      --line-2:    rgba(150, 165, 220, .38);
+      --ink:       #e8e8f5;
+      --ink-2:     #a8b0c0;
+      --ink-3:     #8b93a7;
+      --accent:    #06b6d4;
+      --warn:      #f59e0b;
+      --good:      #10b981;
+      --crit:      #f43f5e;
+      --violet:    #a78bfa;
+      --hatch:     rgba(150, 165, 220, .12);
+      --shadow:    0 1px 2px rgba(0, 0, 0, .4), 0 8px 28px rgba(0, 0, 0, .35);
+    }
+  }
+
+  :root[data-theme="light"] {
+    --bg: #f4f5f8; --surface: #ffffff; --surface-2: #e9ecf2;
+    --line: rgba(20,26,48,.16); --line-2: rgba(20,26,48,.32);
+    --ink: #12141c; --ink-2: #414859; --ink-3: #6b7383;
+    --accent: #0e7490; --warn: #b45309; --good: #047857; --crit: #be123c; --violet: #6d28d9;
+    --hatch: rgba(20,26,48,.10);
+    --shadow: 0 1px 2px rgba(16,22,44,.06), 0 8px 24px rgba(16,22,44,.05);
+  }
+  :root[data-theme="dark"] {
+    --bg: #07070f; --surface: #0e0f1a; --surface-2: #171a28;
+    --line: rgba(150,165,220,.18); --line-2: rgba(150,165,220,.38);
+    --ink: #e8e8f5; --ink-2: #a8b0c0; --ink-3: #8b93a7;
+    --accent: #06b6d4; --warn: #f59e0b; --good: #10b981; --crit: #f43f5e; --violet: #a78bfa;
+    --hatch: rgba(150,165,220,.12);
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 28px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+
+  /* ── title block ─────────────────────────────────────────────── */
+
+  .masthead {
+    border-bottom: 1px solid var(--line-2);
+    padding: 56px 0 0;
+    margin-bottom: 8px;
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 0 0 14px;
+  }
+  .masthead h1 {
+    font-size: clamp(28px, 4.4vw, 44px);
+    line-height: 1.12;
+    letter-spacing: -.022em;
+    font-weight: 600;
+    margin: 0 0 12px;
+    text-wrap: balance;
+  }
+  .masthead .lede {
+    color: var(--ink-2);
+    max-width: 62ch;
+    margin: 0 0 28px;
+  }
+  .titleblock {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .titleblock div {
+    padding: 12px 14px 12px 0;
+    border-right: 1px solid var(--line);
+  }
+  .titleblock div:last-child { border-right: 0; }
+  .titleblock dt {
+    color: var(--ink-3);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin: 0 0 4px;
+    font-size: 10px;
+  }
+  .titleblock dd { margin: 0; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  .caveat {
+    margin: 20px 0 0;
+    padding: 12px 16px;
+    border-left: 2px solid var(--warn);
+    background: var(--surface);
+    color: var(--ink-2);
+    font-size: 13.5px;
+  }
+
+  /* ── sheets ──────────────────────────────────────────────────── */
+
+  .sheet {
+    margin-top: 72px;
+    scroll-margin-top: 24px;
+  }
+  .sheet-head {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line-2);
+    flex-wrap: wrap;
+  }
+  .sheet-no {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    letter-spacing: .08em;
+    padding-top: 4px;
+  }
+  .sheet-head h2 {
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -.012em;
+    margin: 0;
+    flex: 1 1 220px;
+  }
+  .sheet-head h2 span {
+    display: block;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ink-3);
+    letter-spacing: 0;
+    margin-top: 3px;
+  }
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .chip-built   { color: var(--good); }
+  .chip-partial { color: var(--warn); }
+  .chip-new     { color: var(--ink-3); }
+  .chip-live    { color: var(--accent); }
+
+  .frame {
+    position: relative;
+    margin-top: 24px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+  }
+  .frame > svg { display: block; width: 100%; height: auto; min-width: 640px; color: var(--ink-2); }
+  .frame figcaption {
+    border-top: 1px solid var(--line);
+    padding: 10px 16px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    min-width: 640px;
+  }
+  figure { margin: 0; }
+
+  /* keyed callout list */
+  .callouts {
+    list-style: none;
+    margin: 22px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 2px 34px;
+  }
+  .callouts li {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 11px;
+    padding: 9px 0;
+    border-top: 1px solid var(--line);
+    font-size: 13.5px;
+    color: var(--ink-2);
+    align-items: start;
+  }
+  .cn {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    border: 1px solid var(--line-2);
+    border-radius: 50%;
+    width: 20px; height: 20px;
+    display: grid; place-items: center;
+    margin-top: 1px;
+  }
+  .callouts b { color: var(--ink); font-weight: 600; }
+  .callouts em {
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--warn);
+  }
+
+  /* ── live panel (sheet 02) ───────────────────────────────────── */
+
+  .live { border-color: var(--line-2); }
+  .live-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-2);
+    min-width: 640px;
+  }
+  .live-bar .hint {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--ink-3);
+    letter-spacing: .04em;
+    margin-left: auto;
+  }
+  button.ctl {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    background: var(--surface);
+    border: 1px solid var(--line-2);
+    border-radius: 2px;
+    padding: 6px 11px;
+    cursor: pointer;
+  }
+  button.ctl:hover { color: var(--ink); border-color: var(--accent); }
+  button.ctl[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
+  button.ctl:focus-visible, #cyl:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  #cyl { touch-action: pan-y; cursor: grab; }
+  #cyl.dragging { cursor: grabbing; }
+
+  .readout {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--line);
+    padding: 12px 16px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    min-width: 640px;
+  }
+  .readout .pair { color: var(--ink); font-size: 14px; letter-spacing: .01em; }
+  .readout .pair.idle { color: var(--ink-3); }
+  .readout .ev { color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .readout .ev b { color: var(--accent); font-weight: 500; }
+  .readout .tag {
+    margin-left: auto;
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  /* ── modal ───────────────────────────────────────────────────── */
+
+  dialog#crossmodal {
+    border: 1px solid var(--line-2);
+    background: var(--surface);
+    color: var(--ink);
+    padding: 0;
+    max-width: 520px;
+    width: calc(100% - 32px);
+    box-shadow: var(--shadow);
+  }
+  dialog#crossmodal::backdrop { background: rgba(4, 6, 16, .58); }
+  .m-head {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--line);
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .m-head h3 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -.01em; }
+  .m-head p {
+    margin: 4px 0 0; font-family: var(--font-mono);
+    font-size: 10.5px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-3);
+  }
+  .m-close {
+    margin-left: auto; background: none; border: 0; cursor: pointer;
+    color: var(--ink-3); font-size: 20px; line-height: 1; padding: 2px 4px;
+  }
+  .m-close:hover { color: var(--ink); }
+  .m-body { padding: 6px 18px 18px; }
+  .m-body section { border-top: 1px solid var(--line); padding: 13px 0 4px; }
+  .m-body h4 {
+    margin: 0 0 8px; font-family: var(--font-mono); font-size: 10.5px;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); font-weight: 500;
+  }
+  .ph { background: var(--surface-2); border-radius: 2px; height: 9px; margin-bottom: 6px; }
+  .m-body .note { font-size: 12.5px; color: var(--ink-3); margin: 8px 0 0; }
+
+  /* ── closing blocks ──────────────────────────────────────────── */
+
+  .band { margin-top: 76px; padding-top: 26px; border-top: 1px solid var(--line-2); }
+  .band h2 { font-size: 19px; font-weight: 600; margin: 0 0 6px; letter-spacing: -.012em; }
+  .band > p { color: var(--ink-2); max-width: 64ch; margin: 0 0 22px; }
+
+  table.spec {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  table.spec th, table.spec td {
+    text-align: left;
+    padding: 10px 14px 10px 0;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  table.spec th {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 500;
+    border-bottom-color: var(--line-2);
+  }
+  table.spec td.step {
+    font-family: var(--font-mono);
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  table.spec td b { font-weight: 600; }
+  table.spec td.dep { color: var(--ink-3); font-family: var(--font-mono); font-size: 11.5px; }
+
+  .queries { display: grid; gap: 2px; }
+  .query {
+    border-top: 1px solid var(--line);
+    padding: 16px 0;
+    display: grid;
+    grid-template-columns: 78px 1fr;
+    gap: 18px;
+  }
+  .query .qtag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--crit);
+    padding-top: 2px;
+  }
+  .query h3 { margin: 0 0 5px; font-size: 15px; font-weight: 600; }
+  .query p { margin: 0; color: var(--ink-2); font-size: 13.5px; max-width: 66ch; }
+
+  /* ── shared svg vocabulary ───────────────────────────────────── */
+
+  .r      { fill: var(--surface-2); stroke: currentColor; stroke-opacity: .38; }
+  .r-void { fill: none; stroke: currentColor; stroke-opacity: .3; stroke-dasharray: 3 3; }
+  .r-key  { fill: none; stroke: var(--accent); stroke-width: 1.5; }
+  .ln     { stroke: currentColor; stroke-opacity: .45; fill: none; }
+  .ln-key { stroke: var(--accent); fill: none; stroke-width: 1.4; }
+  .ln-fine{ stroke: currentColor; stroke-opacity: .22; fill: none; }
+  .t      { fill: currentColor; font-family: var(--font-mono); font-size: 11px; }
+  .t-sm   { fill: currentColor; font-family: var(--font-mono); font-size: 9.5px; fill-opacity: .7; }
+  .t-hd   { fill: var(--ink); font-family: var(--font-ui); font-size: 12.5px; font-weight: 600; }
+  .t-key  { fill: var(--accent); font-family: var(--font-mono); font-size: 10px; }
+  .mk     { fill: none; stroke: var(--accent); stroke-width: 1; }
+  .mk-t   { fill: var(--accent); font-family: var(--font-mono); font-size: 9.5px; text-anchor: middle; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Product schematic · storyboard</p>
+    <h1>RF Signal Security Taxonomy</h1>
+    <p class="lede">
+      Four views over one entity graph. This sheet set fixes structure, interaction and build
+      order before any of it is written — the drawings are wireframes, not final art.
+    </p>
+    <dl class="titleblock">
+      <div><dt>Revision</dt><dd>A — 2026-08-06</dd></div>
+      <div><dt>Branch</dt><dd>four-view-taxonomy</dd></div>
+      <div><dt>Sheets</dt><dd>7</dd></div>
+      <div><dt>Working name</dt><dd>Penumbra <span style="color:var(--ink-3)">(tbc)</span></dd></div>
+      <div><dt>Source</dt><dd>PLANNING.md</dd></div>
+    </dl>
+    <p class="caveat">
+      <b>Sheet 02 is live.</b> The cylinder is draggable and the crosshair works, because
+      "can you actually read a matrix wrapped on a cylinder?" is the one open question a
+      static drawing cannot answer. Everything else here is a wireframe.
+    </p>
+  </header>
+
+  <!-- ══ SHEET 00 ══════════════════════════════════════════════ -->
+  <section class="sheet" id="s00">
+    <div class="sheet-head">
+      <div class="sheet-no">00</div>
+      <h2>System map<span>One graph, four projections — why the data layer is the whole project</span></h2>
+      <div class="chip chip-new">Not started</div>
+    </div>
+
+    <figure class="frame">
+      <svg viewBox="0 0 900 400" role="img"
+           aria-label="Curated records and snapshotted external sources are normalised into one entity graph, which is projected into four views; the graph is the single upstream dependency of all of them.">
+        <!-- inputs -->
+        <text class="t-sm" x="24" y="30">SOURCES</text>
+        <rect class="r" x="24" y="44" width="168" height="46" rx="2"/>
+        <text class="t-hd" x="38" y="66">Curated records</text>
+        <text class="t-sm" x="38" y="80">authored + DOI-cited</text>
+
+        <rect class="r-void" x="24" y="104" width="168" height="46" rx="2"/>
+        <text class="t-hd" x="38" y="126">ATT&amp;CK · CAPEC</text>
+        <text class="t-sm" x="38" y="140">CC BY · STIX</text>
+
+        <rect class="r-void" x="24" y="164" width="168" height="46" rx="2"/>
+        <text class="t-hd" x="38" y="186">3GPP · ITU-R · FCC</text>
+        <text class="t-sm" x="38" y="200">band + modcod tables</text>
+
+        <rect class="r-void" x="24" y="224" width="168" height="46" rx="2"/>
+        <text class="t-hd" x="38" y="246">SPARTA</text>
+        <text class="t-sm" x="38" y="260">ids only · hand crosswalk</text>
+
+        <!-- ingest -->
+        <path class="ln" d="M192 67 H236" marker-end="url(#a)"/>
+        <path class="ln" d="M192 127 H236" marker-end="url(#a)"/>
+        <path class="ln" d="M192 187 H236" marker-end="url(#a)"/>
+        <path class="ln" d="M192 247 H236" marker-end="url(#a)"/>
+        <rect class="r" x="248" y="44" width="120" height="226" rx="2"/>
+        <text class="t-hd" x="308" y="140" text-anchor="middle">Ingest</text>
+        <text class="t-sm" x="308" y="156" text-anchor="middle" style="text-anchor:middle">normalise</text>
+        <text class="t-sm" x="308" y="170" text-anchor="middle" style="text-anchor:middle">+ provenance</text>
+        <text class="t-sm" x="308" y="184" text-anchor="middle" style="text-anchor:middle">+ retrieval date</text>
+        <text class="t-key" x="308" y="212" text-anchor="middle" style="text-anchor:middle">OFFLINE</text>
+        <text class="t-key" x="308" y="226" text-anchor="middle" style="text-anchor:middle">committed</text>
+
+        <!-- graph -->
+        <path class="ln-key" d="M368 157 H424" marker-end="url(#ak)"/>
+        <rect class="r-key" x="436" y="112" width="150" height="90" rx="2"/>
+        <text class="t-hd" x="511" y="146" text-anchor="middle" style="text-anchor:middle">Entity graph</text>
+        <text class="t-sm" x="511" y="164" text-anchor="middle" style="text-anchor:middle">nodes + edges DERIVED,</text>
+        <text class="t-sm" x="511" y="178" text-anchor="middle" style="text-anchor:middle">never authored twice</text>
+
+        <!-- projections -->
+        <path class="ln" d="M586 157 H626 V64  H660" marker-end="url(#a)"/>
+        <path class="ln" d="M586 157 H626 V128 H660" marker-end="url(#a)"/>
+        <path class="ln" d="M586 157 H626 V192 H660" marker-end="url(#a)"/>
+        <path class="ln" d="M586 157 H626 V256 H660" marker-end="url(#a)"/>
+
+        <text class="t-sm" x="672" y="30">VIEWS</text>
+        <rect class="r-key" x="672" y="44" width="204" height="40" rx="2"/>
+        <text class="t-hd" x="686" y="69">Home — cylinder</text>
+        <rect class="r" x="672" y="108" width="204" height="40" rx="2"/>
+        <text class="t-hd" x="686" y="133">TRANSEC diorama</text>
+        <rect class="r" x="672" y="172" width="204" height="40" rx="2"/>
+        <text class="t-hd" x="686" y="197">COMSEC diorama</text>
+        <rect class="r" x="672" y="236" width="204" height="40" rx="2"/>
+        <text class="t-hd" x="686" y="261">Signal Lab</text>
+
+        <!-- cross-links -->
+        <path class="ln-fine" d="M774 84 V108 M774 148 V172 M774 212 V236"/>
+        <path class="ln-fine" d="M884 64 Q896 160 884 256"/>
+        <text class="t-sm" x="24" y="302">cross-links: a cell opens a kill chain · a kill chain opens a waveform</text>
+
+        <!-- rule + note -->
+        <path class="ln-fine" d="M24 330 H876"/>
+        <text class="t" x="24" y="352" style="fill:var(--warn)">Snapshot, never live-fetch.</text>
+        <text class="t" x="204" y="352">A reviewer must re-run the build and get the same matrix; a static</text>
+        <text class="t" x="24" y="370">Pages deploy has no server to proxy CORS or rate limits; attribution stays auditable in the repo.</text>
+
+        <!-- callout markers -->
+        <g><circle class="mk" cx="308" cy="30" r="9"/><text class="mk-t" x="308" y="33.5">1</text></g>
+        <g><circle class="mk" cx="511" cy="98" r="9"/><text class="mk-t" x="511" y="101.5">2</text></g>
+        <g><circle class="mk" cx="774" cy="300" r="9"/><text class="mk-t" x="774" y="303.5">3</text></g>
+
+        <defs>
+          <marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 1 L7 4 L0 7 z" fill="currentColor" fill-opacity=".55"/>
+          </marker>
+          <marker id="ak" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 1 L7 4 L0 7 z" fill="var(--accent)"/>
+          </marker>
+        </defs>
+      </svg>
+      <figcaption>Fig. 00 — every view is a read of one graph. Build order follows the arrows.</figcaption>
+    </figure>
+
+    <ol class="callouts">
+      <li><span class="cn">1</span><div><b>Ingest runs offline and its output is committed.</b> Dashed source boxes are external and versioned into the repo with a retrieval date.</div></li>
+      <li><span class="cn">2</span><div><b>Edges are computed, never stored twice.</b> Every integration bug in the TRANSEC build came from two tables drifting apart.</div></li>
+      <li><span class="cn">3</span><div><b>Cross-links are the value proposition.</b> Four separate apps would kill them — hence one app, four routes, shared store.</div></li>
+    </ol>
+  </section>
+
+  <!-- ══ SHEET 01 ══════════════════════════════════════════════ -->
+  <section class="sheet" id="s01">
+    <div class="sheet-head">
+      <div class="sheet-no">01</div>
+      <h2>Shell<span>Persistent chrome — navigation, theme, deep-link state</span></h2>
+      <div class="chip chip-partial">Partial</div>
+    </div>
+
+    <figure class="frame">
+      <svg viewBox="0 0 900 300" role="img"
+           aria-label="Application shell: a header carrying the four view tabs, a theme toggle, and a hash route; the view region below swaps between the four views while the store persists.">
+        <rect class="r" x="24" y="24" width="852" height="46" rx="2"/>
+        <text class="t-hd" x="40" y="53">Penumbra</text>
+
+        <g>
+          <rect class="r-key" x="188" y="34" width="66" height="26" rx="2"/>
+          <text class="t-key" x="221" y="51" text-anchor="middle" style="text-anchor:middle">Home</text>
+          <rect class="r-void" x="262" y="34" width="86" height="26" rx="2"/>
+          <text class="t" x="305" y="51" text-anchor="middle" style="text-anchor:middle">TRANSEC</text>
+          <rect class="r-void" x="356" y="34" width="86" height="26" rx="2"/>
+          <text class="t" x="399" y="51" text-anchor="middle" style="text-anchor:middle">COMSEC</text>
+          <rect class="r-void" x="450" y="34" width="92" height="26" rx="2"/>
+          <text class="t" x="496" y="51" text-anchor="middle" style="text-anchor:middle">Signal Lab</text>
+          <rect class="r-void" x="550" y="34" width="60" height="26" rx="2"/>
+          <text class="t" x="580" y="51" text-anchor="middle" style="text-anchor:middle">About</text>
+        </g>
+
+        <rect class="r-void" x="762" y="34" width="46" height="26" rx="2"/>
+        <text class="t-sm" x="785" y="51" text-anchor="middle" style="text-anchor:middle">◐</text>
+        <rect class="r-void" x="816" y="34" width="46" height="26" rx="2"/>
+        <text class="t-sm" x="839" y="51" text-anchor="middle" style="text-anchor:middle">?</text>
+
+        <!-- route -->
+        <rect class="r-void" x="24" y="84" width="852" height="26" rx="2"/>
+        <text class="t" x="40" y="101" style="fill:var(--accent)">#/home/antenna×protocol</text>
+        <text class="t-sm" x="300" y="101">every view state is a URL — deep-linkable, citable in the paper</text>
+
+        <!-- view region -->
+        <rect class="r-void" x="24" y="126" width="852" height="120" rx="2"/>
+        <text class="t-sm" x="450" y="180" text-anchor="middle" style="text-anchor:middle">ACTIVE VIEW</text>
+        <text class="t-sm" x="450" y="196" text-anchor="middle" style="text-anchor:middle">sheets 02 · 04 · 05 · 06</text>
+
+        <path class="ln-fine" d="M24 268 H876"/>
+        <text class="t-sm" x="24" y="286">Store persists across view swaps: selected facet pair, theme, lens, warden position, lab scheme.</text>
+
+        <g><circle class="mk" cx="221" cy="20" r="9"/><text class="mk-t" x="221" y="23.5">1</text></g>
+        <g><circle class="mk" cx="785" cy="20" r="9"/><text class="mk-t" x="785" y="23.5">2</text></g>
+        <g><circle class="mk" cx="40" cy="70" r="9"/><text class="mk-t" x="40" y="73.5">3</text></g>
+      </svg>
+      <figcaption>Fig. 01 — the shell. Four views plus About; the cylinder is the landing route.</figcaption>
+    </figure>
+
+    <ol class="callouts">
+      <li><span class="cn">1</span><div><b>Labelled "Home", not "Cylinder".</b> The geometry is internal vocabulary and must not leak into user-facing copy.</div></li>
+      <li><span class="cn">2</span><div><b>Theme toggle.</b> Light mode doubles as the source for paper-ready figures — the maturity fills land close to the original deck palette.</div></li>
+      <li><span class="cn">3</span><div><b>Hash routing already exists</b> in the shipped app. Extend the scheme rather than replacing it.</div></li>
+    </ol>
+  </section>
+
+  <!-- ══ SHEET 02 ══════════════════════════════════════════════ -->
+  <section class="sheet" id="s02">
+    <div class="sheet-head">
+      <div class="sheet-no">02</div>
+      <h2>Home — the cylinder<span>11 facets squared, wrapped on a cyclic axis</span></h2>
+      <div class="chip chip-live">Live prototype</div>
+    </div>
+
+    <div class="frame live">
+      <div class="live-bar">
+        <button class="ctl" id="btn-unroll" aria-pressed="false">Unroll</button>
+        <button class="ctl" id="btn-spin">Rotate</button>
+        <span class="hint">drag to rotate · arrow keys to move · enter to open</span>
+      </div>
+
+      <svg id="cyl" viewBox="0 0 920 540" tabindex="0" role="application"
+           aria-label="Facet-by-facet matrix wrapped on a cylinder. Drag to rotate, arrow keys to move between cells, Enter to open a crossing.">
+        <defs>
+          <pattern id="void" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="6" stroke="var(--line-2)" stroke-width="1"/>
+          </pattern>
+        </defs>
+        <g id="cyl-cells"></g>
+        <g id="cyl-rowlabels"></g>
+        <g id="cyl-collabels"></g>
+        <g id="cyl-legend"></g>
+      </svg>
+
+      <div class="readout">
+        <span class="pair idle" id="ro-pair">— hover or focus a cell —</span>
+        <span class="ev" id="ro-ev"></span>
+        <span class="tag">Fixed readout · never moves</span>
+      </div>
+    </div>
+
+    <ol class="callouts">
+      <li><span class="cn">1</span><div><b>No text in cells.</b> Click opens a modal. This removes the glyph-warping objection to a curved surface entirely.</div></li>
+      <li><span class="cn">2</span><div><b>Crosshair + fixed readout.</b> Curvature actively degrades header-tracing — column lines converge at the silhouette — so the readout sidesteps the task instead of fighting it.</div></li>
+      <li><span class="cn">3</span><div><b>Hue = facet family</b> (six groups, not eleven). Orientation while rotating, at a count perception can hold.</div></li>
+      <li><span class="cn">4</span><div><b>Lightness = evidence density.</b> The one thing position cannot tell you, and it makes the surface a research-gap map.</div></li>
+      <li><span class="cn">5</span><div><b>The bright tile is Band × Objective</b> — the shipped 45-cell matrix, already authored and cited. The published work sits inside the new work.</div></li>
+      <li><span class="cn">6</span><div><b>The diagonal is excluded</b>, hatched. A facet crossed with itself is a glossary entry, not a relation.</div></li>
+      <li><span class="cn">7</span><div><b>Unroll to a flat grid</b> — same data, same cells, one control. Cylinder to orient, grid to work. <em>This transition is the paper's headline figure.</em></div></li>
+      <li><span class="cn">8</span><div><b>Camera tilt is a readability constraint, not a taste call.</b> Row labels sit at the silhouette; the front face — where the eye lands — sits lower by the tilt. The first build of this sheet used a steeper tilt and read <em>one row wrong</em>. Keep the offset under one row height.</div></li>
+    </ol>
+  </section>
+
+  <!-- ══ SHEET 03 ══════════════════════════════════════════════ -->
+  <section class="sheet" id="s03">
+    <div class="sheet-head">
+      <div class="sheet-no">03</div>
+      <h2>Crossing modal<span>What opens when a cell is clicked — the only place cell text lives</span></h2>
+      <div class="chip chip-new">Not started</div>
+    </div>
+
+    <figure class="frame">
+      <svg viewBox="0 0 900 340" role="img"
+           aria-label="Crossing modal wireframe: header naming the facet pair, a pair list of concrete instances, evidence with citations, and cross-links out to the other three views.">
+        <rect class="r" x="230" y="20" width="440" height="300" rx="2"/>
+
+        <path class="ln-fine" d="M230 74 H670"/>
+        <text class="t-hd" x="250" y="48">Antenna × Protocol</text>
+        <text class="t-sm" x="250" y="64">RELATION · 14 PAIRS · EVIDENCE 0.62</text>
+        <text class="t" x="648" y="48" text-anchor="end" style="text-anchor:end">✕</text>
+
+        <text class="t-sm" x="250" y="96">PAIRS</text>
+        <rect class="r" x="250" y="104" width="400" height="17" rx="2"/>
+        <text class="t-sm" x="258" y="116">phased array ↔ Starlink Ku user terminal</text>
+        <rect class="r" x="250" y="125" width="400" height="17" rx="2"/>
+        <text class="t-sm" x="258" y="137">helical ↔ GPS L1 C/A</text>
+        <rect class="r" x="250" y="146" width="400" height="17" rx="2"/>
+        <text class="t-sm" x="258" y="158">parabolic ↔ DVB-S2X downlink</text>
+
+        <path class="ln-fine" d="M250 178 H650"/>
+        <text class="t-sm" x="250" y="196">EVIDENCE</text>
+        <rect class="r" x="250" y="204" width="290" height="8" rx="2"/>
+        <rect class="r" x="250" y="216" width="230" height="8" rx="2"/>
+        <text class="t-sm" x="556" y="212" style="fill:var(--accent)">3 DOI refs</text>
+
+        <path class="ln-fine" d="M250 240 H650"/>
+        <text class="t-sm" x="250" y="258">OPEN IN</text>
+        <rect class="r-key" x="250" y="266" width="96" height="24" rx="2"/>
+        <text class="t-key" x="298" y="282" text-anchor="middle" style="text-anchor:middle">TRANSEC</text>
+        <rect class="r-void" x="356" y="266" width="96" height="24" rx="2"/>
+        <text class="t-sm" x="404" y="282" text-anchor="middle" style="text-anchor:middle">COMSEC</text>
+        <rect class="r-void" x="462" y="266" width="96" height="24" rx="2"/>
+        <text class="t-sm" x="510" y="282" text-anchor="middle" style="text-anchor:middle">Signal Lab</text>
+
+        <!-- leaders -->
+        <path class="ln-fine" d="M230 44 H150"/>
+        <text class="t-sm" x="24" y="40">pair name repeats the</text>
+        <text class="t-sm" x="24" y="53">fixed readout verbatim</text>
+
+        <path class="ln-fine" d="M670 130 H790"/>
+        <text class="t-sm" x="798" y="126">the relation</text>
+        <text class="t-sm" x="798" y="139">is a SET,</text>
+        <text class="t-sm" x="798" y="152">not a value</text>
+
+        <path class="ln-fine" d="M670 278 H790"/>
+        <text class="t-sm" x="798" y="274">greyed when</text>
+        <text class="t-sm" x="798" y="287">no correlate</text>
+
+        <g><circle class="mk" cx="150" cy="44" r="9"/><text class="mk-t" x="150" y="47.5">1</text></g>
+        <g><circle class="mk" cx="790" cy="130" r="9"/><text class="mk-t" x="790" y="133.5">2</text></g>
+        <g><circle class="mk" cx="790" cy="278" r="9"/><text class="mk-t" x="790" y="281.5">3</text></g>
+      </svg>
+      <figcaption>Fig. 03 — the modal carries all cell text, so the cylinder surface can stay purely graphical.</figcaption>
+    </figure>
+
+    <ol class="callouts">
+      <li><span class="cn">1</span><div><b>The title restates the readout exactly.</b> Continuity between hover and open is what keeps a text-free surface navigable.</div></li>
+      <li><span class="cn">2</span><div><b>A cell is a set of pairs, not a fact.</b> This is why the surface can only encode density — there is no single value to show.</div></li>
+      <li><span class="cn">3</span><div><b>Cross-links out.</b> Buttons grey out where the crossing has no correlate in that view, rather than opening an empty scene.</div></li>
+    </ol>
+  </section>
+
+  <!-- ══ SHEET 04 ══════════════════════════════════════════════ -->
+  <section class="sheet" id="s04">
+    <div class="sheet-head">
+      <div class="sheet-no">04</div>
+      <h2>TRANSEC diorama<span>The shipped ground-to-orbit scene — view 1 of 4</span></h2>
+      <div class="chip chip-built">Built</div>
+    </div>
+
+    <figure class="frame">
+      <svg viewBox="0 0 900 360" role="img"
+           aria-label="TRANSEC diorama: orbital layers over a ground plane with emitters, a draggable warden that reports three verdicts, an objective lens, and the RF band ribbon.">
+        <rect class="r-void" x="24" y="20" width="852" height="270" rx="2"/>
+
+        <path class="ln-fine" d="M40 62 H860 M40 104 H860 M40 150 H860"/>
+        <text class="t-sm" x="46" y="58">GEO</text>
+        <text class="t-sm" x="46" y="100">MEO · GNSS</text>
+        <text class="t-sm" x="46" y="146">LEO</text>
+
+        <circle class="r-key" cx="300" cy="150" r="7"/>
+        <circle class="r" cx="470" cy="150" r="7"/>
+        <circle class="r" cx="360" cy="104" r="7"/>
+        <circle class="r" cx="600" cy="62" r="7"/>
+
+        <path class="ln-fine" d="M40 250 H860"/>
+        <text class="t-sm" x="46" y="266">GROUND</text>
+        <rect class="r" x="250" y="232" width="16" height="18"/>
+        <rect class="r" x="520" y="232" width="16" height="18"/>
+
+        <!-- links -->
+        <path class="ln-key" d="M258 232 L296 158"/>
+        <path class="ln" d="M304 158 L262 232" stroke-dasharray="3 3"/>
+        <path class="ln" d="M528 232 L466 158"/>
+        <path class="ln-fine" d="M307 148 H353" stroke-dasharray="2 3"/>
+        <text class="t-sm" x="316" y="142">ISL</text>
+
+        <text class="t-key" x="196" y="196">uplink</text>
+        <text class="t-sm" x="330" y="212">downlink</text>
+
+        <!-- warden -->
+        <g>
+          <rect class="r-key" x="686" y="214" width="118" height="60" rx="2"/>
+          <text class="t-key" x="698" y="232">WARDEN</text>
+          <text class="t-sm" x="698" y="248">● EXPOSED</text>
+          <text class="t-sm" x="698" y="262">◐ ENERGY ONLY</text>
+        </g>
+        <path class="ln-fine" d="M686 236 L474 158" stroke-dasharray="2 4"/>
+
+        <!-- lens -->
+        <rect class="r" x="24" y="306" width="140" height="30" rx="2"/>
+        <text class="t" x="38" y="326">LENS: LPD ▾</text>
+        <rect class="r-void" x="176" y="306" width="700" height="30" rx="2"/>
+        <text class="t-sm" x="192" y="326">HF</text>
+        <text class="t-sm" x="262" y="326">VHF</text>
+        <text class="t-sm" x="336" y="326">UHF</text>
+        <text class="t-sm" x="410" y="326">L</text>
+        <text class="t-sm" x="474" y="326">S</text>
+        <text class="t-sm" x="536" y="326">C</text>
+        <text class="t-sm" x="598" y="326">X</text>
+        <text class="t-sm" x="660" y="326">Ku/Ka</text>
+        <text class="t-sm" x="756" y="326">mmWave</text>
+        <text class="t-key" x="836" y="326">optical</text>
+
+        <g><circle class="mk" cx="300" cy="128" r="9"/><text class="mk-t" x="300" y="131.5">1</text></g>
+        <g><circle class="mk" cx="745" cy="200" r="9"/><text class="mk-t" x="745" y="203.5">2</text></g>
+        <g><circle class="mk" cx="836" cy="292" r="9"/><text class="mk-t" x="836" y="295.5">3</text></g>
+      </svg>
+      <figcaption>Fig. 04 — built and deployed. Becomes view 1 once its data moves into the shared schema.</figcaption>
+    </figure>
+
+    <ol class="callouts">
+      <li><span class="cn">1</span><div><b>Link strands split by direction</b> — uplink and downlink rendered separately, coloured by which objective is at risk. <em>Planned, not built.</em></div></li>
+      <li><span class="cn">2</span><div><b>The warden needs an orbital vantage.</b> From the ground it observes downlinks; from orbit it geolocates the terminal. <code>WardenPosition.elevated</code> already exists in the store and has never been read.</div></li>
+      <li><span class="cn">3</span><div><b>Optical is the endpoint of the ribbon</b>, where confinement becomes absolute — microradian divergence propagating in vacuum, so the scatterer counterexample does not apply.</div></li>
+    </ol>
+  </section>
+
+  <!-- ══ SHEET 05 ══════════════════════════════════════════════ -->
+  <section class="sheet" id="s05">
+    <div class="sheet-head">
+      <div class="sheet-no">05</div>
+      <h2>COMSEC diorama<span>Pick an attack, watch it propagate through real equipment</span></h2>
+      <div class="chip chip-new">Not started</div>
+    </div>
+
+    <figure class="frame">
+      <svg viewBox="0 0 900 340" role="img"
+           aria-label="COMSEC diorama: an attack list on the left; selecting one lights a numbered kill chain across a device scene of terminal, modem, crypto unit, teleport and backhaul, with unaffected devices dimmed.">
+        <!-- attack list -->
+        <text class="t-sm" x="24" y="34">ATTACKS</text>
+        <rect class="r-key" x="24" y="44" width="176" height="28" rx="2"/>
+        <text class="t-key" x="36" y="62">Downlink intercept</text>
+        <rect class="r-void" x="24" y="78" width="176" height="28" rx="2"/>
+        <text class="t-sm" x="36" y="96">Key exfiltration</text>
+        <rect class="r-void" x="24" y="112" width="176" height="28" rx="2"/>
+        <text class="t-sm" x="36" y="130">Modem firmware wipe</text>
+        <rect class="r-void" x="24" y="146" width="176" height="28" rx="2"/>
+        <text class="t-sm" x="36" y="164">Replay / meaconing</text>
+        <rect class="r-void" x="24" y="180" width="176" height="28" rx="2"/>
+        <text class="t-sm" x="36" y="198">Teleport lateral move</text>
+        <text class="t-sm" x="24" y="228">…filter by segment</text>
+
+        <!-- device scene -->
+        <rect class="r-void" x="228" y="20" width="648" height="230" rx="2"/>
+
+        <g>
+          <rect class="r-key" x="256" y="96" width="92" height="56" rx="2"/>
+          <text class="t-hd" x="302" y="120" text-anchor="middle" style="text-anchor:middle">Terminal</text>
+          <text class="t-sm" x="302" y="136" text-anchor="middle" style="text-anchor:middle">antenna + LNB</text>
+        </g>
+        <g>
+          <rect class="r-key" x="388" y="96" width="92" height="56" rx="2"/>
+          <text class="t-hd" x="434" y="120" text-anchor="middle" style="text-anchor:middle">Modem</text>
+          <text class="t-sm" x="434" y="136" text-anchor="middle" style="text-anchor:middle">demod + FEC</text>
+        </g>
+        <g opacity=".4">
+          <rect class="r" x="520" y="96" width="92" height="56" rx="2"/>
+          <text class="t-hd" x="566" y="120" text-anchor="middle" style="text-anchor:middle">Crypto</text>
+          <text class="t-sm" x="566" y="136" text-anchor="middle" style="text-anchor:middle">bulk encryptor</text>
+        </g>
+        <g>
+          <rect class="r-key" x="652" y="96" width="92" height="56" rx="2"/>
+          <text class="t-hd" x="698" y="120" text-anchor="middle" style="text-anchor:middle">Teleport</text>
+          <text class="t-sm" x="698" y="136" text-anchor="middle" style="text-anchor:middle">gateway</text>
+        </g>
+        <g opacity=".4">
+          <rect class="r" x="784" y="96" width="68" height="56" rx="2"/>
+          <text class="t-hd" x="818" y="120" text-anchor="middle" style="text-anchor:middle">Backhaul</text>
+        </g>
+
+        <!-- chain -->
+        <path class="ln-key" d="M348 124 H384" marker-end="url(#ak2)"/>
+        <path class="ln-key" d="M480 124 H516" stroke-dasharray="3 3"/>
+        <path class="ln-key" d="M612 124 H648" marker-end="url(#ak2)"/>
+        <path class="ln-fine" d="M744 124 H780"/>
+
+        <circle class="mk" cx="302" cy="76" r="9"/><text class="mk-t" x="302" y="79.5">1</text>
+        <circle class="mk" cx="434" cy="76" r="9"/><text class="mk-t" x="434" y="79.5">2</text>
+        <circle class="mk" cx="698" cy="76" r="9"/><text class="mk-t" x="698" y="79.5">3</text>
+
+        <text class="t-sm" x="256" y="188">1 · RF capture at the aperture — no access required</text>
+        <text class="t-sm" x="256" y="204">2 · frame sync recovered from published structure</text>
+        <text class="t-sm" x="256" y="220">3 · cleartext payload read at the gateway</text>
+        <text class="t-sm" x="520" y="172" style="fill:var(--warn)">bypassed — not in path</text>
+
+        <path class="ln-fine" d="M24 274 H876"/>
+        <text class="t" x="24" y="296" style="fill:var(--accent)">The visualisation is the contribution</text>
+        <text class="t" x="286" y="296">— SPARTA enumerates TTPs but never shows them moving</text>
+        <text class="t" x="24" y="314">through concrete hardware. COMSEC returns as a kill chain, and still never becomes a matrix axis.</text>
+
+        <defs>
+          <marker id="ak2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 1 L7 4 L0 7 z" fill="var(--accent)"/>
+          </marker>
+        </defs>
+      </svg>
+      <figcaption>Fig. 05 — dimmed devices are out of the selected chain; the dashed hop is the one being bypassed.</figcaption>
+    </figure>
+
+    <ol class="callouts">
+      <li><span class="cn">1</span><div><b>Entry point.</b> Each chain starts at the physical layer, which is what ties this view back to the taxonomy rather than duplicating SPARTA.</div></li>
+      <li><span class="cn">2</span><div><b>Numbered steps are a real sequence</b>, so numbering carries information here — unlike decorative step markers.</div></li>
+      <li><span class="cn">3</span><div><b>A bypassed device is the finding.</b> Showing crypto sitting unused beside the path is the clearest statement of why civil systems read Weak at PHY.</div></li>
+    </ol>
+  </section>
+
+  <!-- ══ SHEET 06 ══════════════════════════════════════════════ -->
+  <section class="sheet" id="s06">
+    <div class="sheet-head">
+      <div class="sheet-no">06</div>
+      <h2>Signal Lab<span>Promoted to top-level — 25–40 schemes need a browsing surface</span></h2>
+      <div class="chip chip-partial">Partial</div>
+    </div>
+
+    <figure class="frame">
+      <svg viewBox="0 0 900 340" role="img"
+           aria-label="Signal Lab: a left rail of schemes grouped by family, a two-panel compare mode showing spectrum and constellation for each side, and adversary controls beneath.">
+        <!-- rail -->
+        <text class="t-sm" x="24" y="34">FAMILIES</text>
+        <rect class="r-void" x="24" y="44" width="160" height="212" rx="2"/>
+        <text class="t-sm" x="36" y="64">▾ Linear</text>
+        <text class="t-sm" x="48" y="80">BPSK · QPSK · 16QAM</text>
+        <text class="t-sm" x="36" y="102">▾ Spread spectrum</text>
+        <text class="t-sm" x="48" y="118">DSSS · FHSS</text>
+        <text class="t-key" x="36" y="142">▾ GNSS / BOC</text>
+        <text class="t-key" x="48" y="158">C/A · BOC(1,1)</text>
+        <text class="t-key" x="48" y="172">AltBOC · M-code</text>
+        <text class="t-sm" x="36" y="194">▸ CPM</text>
+        <text class="t-sm" x="36" y="212">▸ Optical</text>
+        <text class="t-sm" x="36" y="230">▸ TT&amp;C</text>
+        <text class="t-sm" x="36" y="250">filter by objective ▾</text>
+
+        <!-- panel A -->
+        <rect class="r-key" x="200" y="44" width="330" height="196" rx="2"/>
+        <text class="t-key" x="214" y="64">GPS L1 C/A — BPSK(1)</text>
+        <polyline class="ln-key" points="214,140 250,138 268,104 286,138 322,140 340,136 358,142 394,139 412,110 430,140 466,141 500,139"/>
+        <path class="ln-fine" d="M214 160 H516"/>
+        <text class="t-sm" x="214" y="176">single main lobe · 2 MHz null-to-null</text>
+        <rect class="r-void" x="214" y="188" width="140" height="44" rx="2"/>
+        <text class="t-sm" x="284" y="214" text-anchor="middle" style="text-anchor:middle">constellation</text>
+        <rect class="r-void" x="366" y="188" width="150" height="44" rx="2"/>
+        <text class="t-sm" x="441" y="214" text-anchor="middle" style="text-anchor:middle">correlation peak</text>
+
+        <!-- panel B -->
+        <rect class="r" x="546" y="44" width="330" height="196" rx="2"/>
+        <text class="t-hd" x="560" y="64">GPS M-code — BOC(10,5)</text>
+        <polyline class="ln" points="560,140 590,139 606,112 620,140 660,141 690,138 706,120 722,141 762,140 800,139 816,114 830,140 862,141"/>
+        <path class="ln-fine" d="M560 160 H862"/>
+        <text class="t-sm" x="560" y="176">split spectrum · energy pushed off centre</text>
+        <rect class="r-void" x="560" y="188" width="140" height="44" rx="2"/>
+        <text class="t-sm" x="630" y="214" text-anchor="middle" style="text-anchor:middle">constellation</text>
+        <rect class="r-void" x="712" y="188" width="150" height="44" rx="2"/>
+        <text class="t-sm" x="787" y="214" text-anchor="middle" style="text-anchor:middle">correlation peak</text>
+
+        <!-- adversary -->
+        <rect class="r-void" x="200" y="254" width="676" height="56" rx="2"/>
+        <text class="t-sm" x="214" y="274" style="fill:var(--crit)">ADVERSARY</text>
+        <text class="t-sm" x="300" y="274">barrage ─────●───  partial-band ──●─────  follower ─●──────  J/S +12 dB</text>
+        <text class="t-sm" x="214" y="294">already implemented and tested in dsp/channel.ts — never surfaced in any UI</text>
+
+        <g><circle class="mk" cx="152" cy="138" r="9"/><text class="mk-t" x="152" y="141.5">1</text></g>
+        <g><circle class="mk" cx="538" cy="30" r="9"/><text class="mk-t" x="538" y="33.5">2</text></g>
+        <g><circle class="mk" cx="182" cy="282" r="9"/><text class="mk-t" x="182" y="285.5">3</text></g>
+      </svg>
+      <figcaption>Fig. 06 — compare mode is the primary layout, because most of these schemes only mean something in contrast.</figcaption>
+    </figure>
+
+    <ol class="callouts">
+      <li><span class="cn">1</span><div><b>BOC family first.</b> Nearly free on the existing spreading code, and the split-spectrum signature visibly explains why M-code resists jamming. Highest value per unit of work.</div></li>
+      <li><span class="cn">2</span><div><b>Compare mode, not a single panel.</b> One comparison is already hard-coded; generalising it turns a fixed demo into a tool.</div></li>
+      <li><span class="cn">3</span><div><b>The jammers already exist.</b> Barrage, partial-band and follower are written and passing tests — the attack layer is far less new code than it looks.</div></li>
+    </ol>
+  </section>
+
+  <!-- ══ BUILD ORDER ═══════════════════════════════════════════ -->
+  <div class="band">
+    <h2>Build order</h2>
+    <p>
+      Every view is a read of the graph, so the schema gates all four. Nothing below the line
+      can start before the thing above it is stable.
+    </p>
+    <table class="spec">
+      <thead>
+        <tr><th style="width:56px">Step</th><th>Work</th><th style="width:210px">Blocked by</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="step">01</td><td><b>Entity schema + facet registry</b><br>11 facets, 6 families, relation records with provenance</td><td class="dep">—</td></tr>
+        <tr><td class="step">02</td><td><b>Migrate the 45 shipped cells</b> into the schema as the Band × Objective tile</td><td class="dep">01</td></tr>
+        <tr><td class="step">03</td><td><b>Readability + themes</b> — contrast fixes, 11px floor, tabular-nums, light tokens</td><td class="dep">—</td></tr>
+        <tr><td class="step">04</td><td><b>Home view</b> — cylinder, unroll, crosshair, crossing modal</td><td class="dep">01, 02</td></tr>
+        <tr><td class="step">05</td><td><b>generators.ts → registry</b> before authoring 30 more schemes</td><td class="dep">—</td></tr>
+        <tr><td class="step">06</td><td><b>Signal Lab as a view</b> — rail, compare mode, adversary controls, BOC family</td><td class="dep">05</td></tr>
+        <tr><td class="step">07</td><td><b>Ingest pipeline</b> + hand-curated SPARTA crosswalk</td><td class="dep">01</td></tr>
+        <tr><td class="step">08</td><td><b>COMSEC diorama</b> + kill-chain model</td><td class="dep">01, 07</td></tr>
+        <tr><td class="step">09</td><td><b>TRANSEC direction axis</b> — split strands, orbital warden vantage</td><td class="dep">02, and the open question below</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══ OPEN QUESTIONS ════════════════════════════════════════ -->
+  <div class="band">
+    <h2>Open — decide before step 04</h2>
+    <p>Three unresolved items, ordered by how much they cost to get wrong.</p>
+    <div class="queries">
+      <div class="query">
+        <div class="qtag">Homeless</div>
+        <div>
+          <h3>Where does the SPACECOM expansion live?</h3>
+          <p>Link direction, GNSS civil/military rows, ISL and optical were the paper's contribution
+          claim a week ago. Under the four-view architecture they have no view. Facet values in Home,
+          a late addition to TRANSEC, or dropped.</p>
+        </div>
+      </div>
+      <div class="query">
+        <div class="qtag">Structural</div>
+        <div>
+          <h3>Is <code>Objective</code> really the 11th facet?</h3>
+          <p>It is absent from the sketch. If yes, Home subsumes the shipped matrix and the published
+          work sits inside the new work. If no, TRANSEC stays a peer view beside it and the
+          relationship is looser.</p>
+        </div>
+      </div>
+      <div class="query">
+        <div class="qtag">Load-bearing</div>
+        <div>
+          <h3>Does the cyclic ordering hold?</h3>
+          <p>Protocol → Band → Modulation → Antenna → Propagation → Noise → Attack → Objective →
+          Mitigation → Limitation → Use-case → back to Protocol. The cylinder's entire justification
+          rests on that loop being real rather than convenient. Pressure-test it before step 04 —
+          if it fails, the honest answer is a flat matrix.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<dialog id="crossmodal">
+  <div class="m-head">
+    <div>
+      <h3 id="m-title">Antenna × Protocol</h3>
+      <p id="m-sub">RELATION</p>
+    </div>
+    <button class="m-close" id="m-close" aria-label="Close">✕</button>
+  </div>
+  <div class="m-body">
+    <section>
+      <h4>Pairs</h4>
+      <div class="ph" style="width:82%"></div>
+      <div class="ph" style="width:64%"></div>
+      <div class="ph" style="width:73%"></div>
+    </section>
+    <section>
+      <h4>Evidence</h4>
+      <div class="ph" style="width:56%"></div>
+      <div class="ph" style="width:41%"></div>
+    </section>
+    <section>
+      <h4>Open in</h4>
+      <p class="note">TRANSEC · COMSEC · Signal Lab — greyed where the crossing has no correlate.</p>
+    </section>
+    <p class="note">Wireframe only — see Sheet 03 for the full layout.</p>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  "use strict";
+
+  // ── model ────────────────────────────────────────────────────
+  // Column order IS the argued cycle: design → allocate → encode →
+  // radiate → propagate → corrupt → attack → name the goal →
+  // mitigate → residual limit → constrains use → next protocol.
+  var FACETS = [
+    { label: "Protocol",    fam: "system"    },
+    { label: "Band",        fam: "spectrum"  },
+    { label: "Modulation",  fam: "spectrum"  },
+    { label: "Antenna",     fam: "physical"  },
+    { label: "Propagation", fam: "physical"  },
+    { label: "Noise",       fam: "physical"  },
+    { label: "Attack",      fam: "adversary" },
+    { label: "Objective",   fam: "defense"   },
+    { label: "Mitigation",  fam: "defense"   },
+    { label: "Limitation",  fam: "residual"  },
+    { label: "Use-case",    fam: "system"    }
+  ];
+  var HUE = { system: 250, spectrum: 190, physical: 158, adversary: 350, defense: 38, residual: 288 };
+  var FAM_LABEL = {
+    system: "System", spectrum: "Spectrum", physical: "Physical",
+    adversary: "Adversary", defense: "Defence", residual: "Residual"
+  };
+
+  var N = FACETS.length;
+  var BAND = 1, OBJECTIVE = 7;   // the shipped tile
+
+  // Symmetric evidence matrix, seeded so the drawing is stable.
+  var seed = 0x9e37;
+  function rnd() {
+    seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5;
+    return ((seed >>> 0) % 10000) / 10000;
+  }
+  var EV = [];
+  for (var i = 0; i < N; i++) { EV.push(new Array(N).fill(0)); }
+  for (i = 0; i < N; i++) {
+    for (var j = i + 1; j < N; j++) {
+      var v = 0.06 + rnd() * 0.72;
+      EV[i][j] = v; EV[j][i] = v;
+    }
+  }
+  EV[BAND][OBJECTIVE] = EV[OBJECTIVE][BAND] = 1;
+
+  // ── geometry ─────────────────────────────────────────────────
+  // RY is the camera tilt. Kept deliberately shallow: it is the offset between a
+  // row's silhouette height (where its label sits) and its front-face height (where
+  // the eye actually lands). At RY=52 that gap was ~1.7 rows and the drawing read
+  // one row wrong. Under one row is the constraint.
+  var CX = 480, RX = 290, RY = 26;
+  var Y_LABEL_RING = 76, Y_TOP = 122, ROW_H = 32;
+  var FLAT_L = 190, FLAT_W = 580;
+  var STEP = (Math.PI * 2) / N;
+
+  var svg   = document.getElementById("cyl");
+  var gCell = document.getElementById("cyl-cells");
+  var gRow  = document.getElementById("cyl-rowlabels");
+  var gCol  = document.getElementById("cyl-collabels");
+  var gLeg  = document.getElementById("cyl-legend");
+
+  var rot = -STEP * 1.5, t = 0, tTarget = 0;
+  var hoverRow = -1, hoverCol = -1;
+  var curRow = 3, curCol = 0;
+  var isDark = false;
+
+  function readTheme() {
+    var attr = document.documentElement.getAttribute("data-theme");
+    isDark = attr ? attr === "dark"
+                  : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+
+  function norm(a) {
+    while (a >  Math.PI) a -= Math.PI * 2;
+    while (a <= -Math.PI) a += Math.PI * 2;
+    return a;
+  }
+  function smooth(e0, e1, x) {
+    var u = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
+    return u * u * (3 - 2 * u);
+  }
+  // Flat position comes from an integer column RANK, not from the continuous
+  // angle. Deriving it from the angle makes the seam column — the one straddling
+  // ±pi — wrap mid-cell and render degenerate.
+  var COL_W = FLAT_W / N;
+  function px(angle, y, rank, frac) {
+    var cylX = CX + RX * Math.sin(angle);
+    var cylY = y + RY * Math.cos(angle);
+    var flatX = FLAT_L + (rank + frac) * COL_W;
+    return [cylX + (flatX - cylX) * t, cylY + (y - cylY) * t];
+  }
+  /** Left-to-right order of every column at the current rotation. */
+  function ranks() {
+    var u = [], c;
+    for (c = 0; c < N; c++) { u.push({ c: c, u: norm(rot + c * STEP) }); }
+    u.sort(function (a, b) { return a.u - b.u; });
+    var out = new Array(N);
+    for (c = 0; c < N; c++) { out[u[c].c] = c; }
+    return out;
+  }
+  // Hue carries facet family (orientation); lightness carries evidence density
+  // (the payload). Saturation is held low on purpose — at full chroma the surface
+  // reads as decoration and the crosshair has nothing to pop against.
+  function cellFill(fam, ev) {
+    var h = HUE[fam];
+    return isDark
+      ? "hsl(" + h + " " + (16 + ev * 26) + "% " + (12 + ev * 34) + "%)"
+      : "hsl(" + h + " " + (14 + ev * 30) + "% " + (94 - ev * 38) + "%)";
+  }
+  function el(tag, attrs) {
+    var n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (var k in attrs) { n.setAttribute(k, attrs[k]); }
+    return n;
+  }
+
+  // ── render ───────────────────────────────────────────────────
+  function render() {
+    gCell.textContent = ""; gRow.textContent = ""; gCol.textContent = ""; gLeg.textContent = "";
+
+    var order = [], c;
+    var RANK = ranks();
+    for (c = 0; c < N; c++) {
+      order.push({ c: c, d: Math.cos(rot + c * STEP) });
+    }
+    order.sort(function (a, b) { return a.d - b.d; });   // painter: back first
+
+    var lit = hoverRow >= 0 || hoverCol >= 0;
+
+    for (var oi = 0; oi < order.length; oi++) {
+      var col = order[oi].c, depth = order[oi].d;
+      if (depth <= 0.02 && t < 0.02) continue;           // back half is hidden on the cylinder
+
+      var th = rot + col * STEP, a1 = th - STEP / 2, a2 = th + STEP / 2;
+      var faceAlpha = depth > 0
+        ? 0.3 + 0.7 * Math.min(1, depth / 0.42)
+        : t * t;
+      if (t > 0) faceAlpha = faceAlpha + (1 - faceAlpha) * t;
+
+      for (var row = 0; row < N; row++) {
+        var yT = Y_TOP + row * ROW_H, yB = yT + ROW_H;
+        var d = "", k, p;
+        for (k = 0; k <= 4; k++) {
+          p = px(a1 + (a2 - a1) * (k / 4), yT, RANK[col], k / 4);
+          d += (k ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1);
+        }
+        for (k = 4; k >= 0; k--) {
+          p = px(a1 + (a2 - a1) * (k / 4), yB, RANK[col], k / 4);
+          d += "L" + p[0].toFixed(1) + " " + p[1].toFixed(1);
+        }
+        d += "Z";
+
+        var onCross = (row === hoverRow || col === hoverCol);
+        var isDiag  = row === col;
+        var alpha   = faceAlpha * (lit && !onCross ? 0.22 : 1);
+
+        var path = el("path", {
+          d: d,
+          fill: isDiag ? "url(#void)" : cellFill(FACETS[row].fam, EV[row][col]),
+          "fill-opacity": alpha.toFixed(3),
+          stroke: onCross && !isDiag ? "var(--accent)" : "var(--line)",
+          "stroke-width": onCross && !isDiag ? 1.4 : 0.6,
+          "stroke-opacity": alpha.toFixed(3)
+        });
+
+        if (!isDiag) {
+          path.style.cursor = "pointer";
+          (function (r, cc) {
+            path.addEventListener("pointerenter", function () {
+              if (dragging) return;
+              hoverRow = r; hoverCol = cc; curRow = r; curCol = cc; render(); readout();
+            });
+            path.addEventListener("click", function (e) { e.stopPropagation(); openModal(r, cc); });
+          }(row, col));
+        }
+        gCell.appendChild(path);
+      }
+    }
+
+    // Row labels — fixed gutter, aligned to the FRONT face (+RY), not the
+    // silhouette. A straight gutter can only be correct at one angle; make it
+    // correct where the reader is actually looking.
+    for (var r2 = 0; r2 < N; r2++) {
+      var ry2 = Y_TOP + r2 * ROW_H + ROW_H / 2 + 4 + RY * (1 - t);
+      var on = r2 === hoverRow;
+      var tx = el("text", {
+        x: 168, y: ry2, "text-anchor": "end",
+        "font-family": "var(--font-mono)", "font-size": "11",
+        fill: on ? "var(--accent)" : "var(--ink-2)",
+        "fill-opacity": on ? 1 : 0.85
+      });
+      tx.textContent = FACETS[r2].label;
+      gRow.appendChild(tx);
+      gRow.appendChild(el("line", {
+        x1: 174, y1: ry2 - 4, x2: 186, y2: ry2 - 4,
+        stroke: on ? "var(--accent)" : "var(--line-2)", "stroke-width": 1
+      }));
+    }
+
+    // column labels — billboarded on the rim, or angled above the flat grid
+    var cylOp = 1 - smooth(0.12, 0.5, t);
+    var flatOp = smooth(0.45, 0.85, t);
+    for (c = 0; c < N; c++) {
+      var thc = rot + c * STEP, dep = Math.cos(thc), onc = c === hoverCol;
+      if (cylOp > 0.01 && dep > 0.16) {
+        var lp = px(thc, Y_LABEL_RING, RANK[c], 0.5);
+        var op = Math.min(1, (dep - 0.16) / 0.3) * cylOp;
+        var t1 = el("text", {
+          x: lp[0].toFixed(1), y: lp[1].toFixed(1), "text-anchor": "middle",
+          "font-family": "var(--font-mono)", "font-size": "11",
+          fill: onc ? "var(--accent)" : "var(--ink-2)", "fill-opacity": op.toFixed(2)
+        });
+        t1.textContent = FACETS[c].label;
+        gCol.appendChild(t1);
+      }
+      if (flatOp > 0.01) {
+        var fx = FLAT_L + (RANK[c] + 0.5) * COL_W;
+        var t2 = el("text", {
+          x: fx.toFixed(1), y: (Y_TOP - 12).toFixed(1), "text-anchor": "start",
+          "font-family": "var(--font-mono)", "font-size": "10.5",
+          fill: onc ? "var(--accent)" : "var(--ink-2)", "fill-opacity": flatOp.toFixed(2),
+          transform: "rotate(-52 " + fx.toFixed(1) + " " + (Y_TOP - 12).toFixed(1) + ")"
+        });
+        t2.textContent = FACETS[c].label;
+        gCol.appendChild(t2);
+      }
+    }
+
+    // legend
+    var fams = Object.keys(HUE), ly = 150;
+    var lt = el("text", {
+      x: 800, y: 132, "font-family": "var(--font-mono)", "font-size": "9.5",
+      fill: "var(--ink-3)", "letter-spacing": ".08em"
+    });
+    lt.textContent = "FAMILY";
+    gLeg.appendChild(lt);
+    for (var f = 0; f < fams.length; f++) {
+      gLeg.appendChild(el("rect", {
+        x: 800, y: ly + f * 20 - 9, width: 11, height: 11, rx: 1,
+        fill: cellFill(fams[f], 0.72)
+      }));
+      var ft = el("text", {
+        x: 818, y: ly + f * 20, "font-family": "var(--font-mono)", "font-size": "10",
+        fill: "var(--ink-3)"
+      });
+      ft.textContent = FAM_LABEL[fams[f]];
+      gLeg.appendChild(ft);
+    }
+    var et = el("text", {
+      x: 800, y: 300, "font-family": "var(--font-mono)", "font-size": "9.5",
+      fill: "var(--ink-3)", "letter-spacing": ".08em"
+    });
+    et.textContent = "EVIDENCE";
+    gLeg.appendChild(et);
+    for (var s = 0; s < 5; s++) {
+      gLeg.appendChild(el("rect", {
+        x: 800 + s * 13, y: 310, width: 11, height: 11, rx: 1,
+        fill: cellFill("spectrum", s / 4)
+      }));
+    }
+    var lo = el("text", { x: 800, y: 338, "font-family": "var(--font-mono)", "font-size": "9.5", fill: "var(--ink-3)" });
+    lo.textContent = "sparse → dense";
+    gLeg.appendChild(lo);
+  }
+
+  // ── readout ──────────────────────────────────────────────────
+  var roPair = document.getElementById("ro-pair");
+  var roEv   = document.getElementById("ro-ev");
+
+  function readout() {
+    if (hoverRow < 0 || hoverCol < 0) {
+      roPair.className = "pair idle";
+      roPair.textContent = "— hover or focus a cell —";
+      roEv.textContent = "";
+      return;
+    }
+    roPair.className = "pair";
+    roPair.textContent = FACETS[hoverRow].label + "  ×  " + FACETS[hoverCol].label;
+    if (hoverRow === hoverCol) {
+      roEv.innerHTML = "diagonal — excluded (a facet crossed with itself is a glossary entry)";
+      return;
+    }
+    var ev = EV[hoverRow][hoverCol];
+    var note = (hoverRow === BAND && hoverCol === OBJECTIVE) || (hoverRow === OBJECTIVE && hoverCol === BAND)
+      ? " · the shipped 45-cell matrix"
+      : ev < 0.25 ? " · research gap" : "";
+    roEv.innerHTML = "evidence <b>" + ev.toFixed(2) + "</b>" + note;
+  }
+
+  // ── interaction ──────────────────────────────────────────────
+  var dragging = false, lastX = 0, moved = 0;
+
+  svg.addEventListener("pointerdown", function (e) {
+    dragging = true; moved = 0; lastX = e.clientX;
+    svg.classList.add("dragging");
+    svg.setPointerCapture(e.pointerId);
+  });
+  svg.addEventListener("pointermove", function (e) {
+    if (!dragging) return;
+    var dx = e.clientX - lastX;
+    lastX = e.clientX; moved += Math.abs(dx);
+    rot += dx * 0.006;
+    render();
+  });
+  function endDrag(e) {
+    if (!dragging) return;
+    dragging = false;
+    svg.classList.remove("dragging");
+    try { svg.releasePointerCapture(e.pointerId); } catch (err) { /* already released */ }
+  }
+  svg.addEventListener("pointerup", endDrag);
+  svg.addEventListener("pointercancel", endDrag);
+  svg.addEventListener("pointerleave", function () {
+    if (dragging) return;
+    hoverRow = -1; hoverCol = -1; render(); readout();
+  });
+
+  svg.addEventListener("keydown", function (e) {
+    var k = e.key, handled = true;
+    if (k === "ArrowUp")         { curRow = (curRow + N - 1) % N; }
+    else if (k === "ArrowDown")  { curRow = (curRow + 1) % N; }
+    else if (k === "ArrowLeft")  { curCol = (curCol + N - 1) % N; rot += STEP; }
+    else if (k === "ArrowRight") { curCol = (curCol + 1) % N; rot -= STEP; }
+    else if (k === "Enter" || k === " ") { openModal(curRow, curCol); }
+    else { handled = false; }
+    if (handled) {
+      e.preventDefault();
+      hoverRow = curRow; hoverCol = curCol;
+      render(); readout();
+    }
+  });
+
+  // unroll
+  var btnUnroll = document.getElementById("btn-unroll");
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var anim = null;
+
+  btnUnroll.addEventListener("click", function () {
+    tTarget = tTarget > 0.5 ? 0 : 1;
+    btnUnroll.setAttribute("aria-pressed", String(tTarget > 0.5));
+    btnUnroll.textContent = tTarget > 0.5 ? "Re-wrap" : "Unroll";
+    if (reduce) { t = tTarget; render(); return; }
+    if (anim) cancelAnimationFrame(anim);
+    (function step() {
+      t += (tTarget - t) * 0.13;
+      if (Math.abs(tTarget - t) < 0.002) { t = tTarget; render(); anim = null; return; }
+      render();
+      anim = requestAnimationFrame(step);
+    }());
+  });
+
+  // nudge rotation, for anyone who does not think to drag
+  var spinAnim = null;
+  document.getElementById("btn-spin").addEventListener("click", function () {
+    if (spinAnim) return;
+    var togo = STEP * 3, per = reduce ? togo : STEP * 0.06;
+    (function step() {
+      var d = Math.min(per, togo);
+      rot -= d; togo -= d; render();
+      spinAnim = togo > 0.001 ? requestAnimationFrame(step) : null;
+    }());
+  });
+
+  // modal
+  var dlg = document.getElementById("crossmodal");
+  function openModal(r, c) {
+    if (r === c) return;
+    document.getElementById("m-title").textContent = FACETS[r].label + " × " + FACETS[c].label;
+    document.getElementById("m-sub").textContent =
+      "RELATION · EVIDENCE " + EV[r][c].toFixed(2);
+    if (typeof dlg.showModal === "function") dlg.showModal();
+  }
+  document.getElementById("m-close").addEventListener("click", function () { dlg.close(); });
+  dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
+
+  // theme
+  var mq = window.matchMedia("(prefers-color-scheme: dark)");
+  if (mq.addEventListener) mq.addEventListener("change", function () { readTheme(); render(); });
+  new MutationObserver(function () { readTheme(); render(); })
+    .observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  readTheme();
+  render();
+  readout();
+}());
+</script>

@@ -1,19 +1,3 @@
-% ===================================================================
-%  Starter bibliography.
-%
-%  READ THIS FIRST.
-%  These entries are scaffolding assembled from the reference list in
-%  PLANNING.md and from the surrounding literature. Author, year and
-%  venue are recorded where they were already established in your own
-%  notes; volume, number, pages and DOI are deliberately LEFT BLANK
-%  rather than guessed. Verify every entry against the publisher record
-%  before submission -- do not trust this file as a source.
-%
-%  The .tex uses \nocite{*}, so everything here appears in the
-%  reference list until you replace \needcite{} markers with real
-%  \cite{} calls and delete \nocite{*}.
-% ===================================================================
-
 % ---- structured adversary knowledge bases -------------------------
 
 @misc{sparta,
@@ -36,144 +20,54 @@
   url    = {https://attack.mitre.org/}
 }
 
-@misc{capec,
-  author = {{MITRE Corporation}},
-  title  = {{CAPEC}: Common Attack Pattern Enumeration and Classification},
-  year   = {2024},
-  url    = {https://capec.mitre.org/}
-}
-
 % ---- satellite and RF security ------------------------------------
 
-@article{tedeschi2022,
-  author  = {Tedeschi, Pietro and Sciancalepore, Savio and Di Pietro, Roberto},
-  title   = {Satellite-based communications security: A survey of threats,
-             solutions, and research challenges},
-  journal = {Computer Networks},
-  year    = {2022},
-  note    = {VERIFY volume/pages/DOI. Cited in Section II-B as a survey
-            that carries a link column but treats the link segment as a
-            single element.}
+@inproceedings{mattar2025cybersecurity,
+  title={What is cybersecurity in space?},
+  author={Mattar, Charbel and Abdo, Jacques Bou and Makhoul, Abdallah and Piranda, Beno{\^\i}t and Demerjian, Jacques},
+  booktitle={2025 IEEE/ACS 22nd International Conference on Computer Systems and Applications (AICCSA)},
+  pages={1--6},
+  year={2025},
+  organization={IEEE}
 }
 
-@inproceedings{pavur2020,
-  author    = {Pavur, James and Moser, Daniel and Strohmeier, Martin and
-               Lenders, Vincent and Martinovic, Ivan},
-  title     = {A Tale of Sea and Sky: On the Security of Maritime {VSAT}
-               Communications},
-  booktitle = {IEEE Symposium on Security and Privacy (S\&P)},
-  year      = {2020},
-  note      = {VERIFY pages/DOI. Supports the claim that downlink
-              cleartext is recoverable at scale.}
+@inproceedings{maatallaoui2023impact,
+  title={The impact of radio frequency (RF) attacks on security and privacy: A comprehensive review},
+  author={Maatallaoui, Abdellah and Touil, Hicham and Setti, Larbi},
+  booktitle={Proceedings of the 6th International Conference on Networking, Intelligent Systems \& Security},
+  pages={1--23},
+  year={2023}
 }
 
-@article{humphreys2023,
-  author  = {Humphreys, Todd E. and Iannucci, Peter A. and
-             Komodromos, Zacharias M. and Graff, Andrew M.},
-  title   = {Signal Structure of the {S}tarlink {K}u-Band Downlink},
-  journal = {IEEE Transactions on Aerospace and Electronic Systems},
-  year    = {2023},
-  note    = {VERIFY volume/number/pages/DOI. Supports the claim that LEO
-            downlink framing has been characterised from third-party
-            observation.}
+@article{peters2021evaluating,
+  title={Evaluating space as the next critical infrastructure sector},
+  author={Peters, Mark},
+  journal={Space Education \& Strategic Applications},
+  volume={2},
+  number={1},
+  year={2021},
+  publisher={Policy Studies Organization}
 }
 
-@misc{kozhaya2025,
-  author = {Kozhaya, Samer and Kassas, Zaher M.},
-  title  = {[TITLE TO CONFIRM] Opportunistic navigation with {LEO}
-            broadband megaconstellation signals},
-  year   = {2025},
-  note   = {VERIFY EVERYTHING -- author list, title, venue and year are
-            from working notes and have not been checked against the
-            publisher record.}
+@techreport{CISA2024SpaceCyber,
+  author      = {{Space Systems Critical Infrastructure Working Group}},
+  title       = {Recommendations to Space System Operators for Improving Cybersecurity},
+  institution = {Cybersecurity and Infrastructure Security Agency},
+  year        = {2024},
+  month       = {June},
+  address     = {Washington, DC},
+  url         = {https://www.cisa.gov/resources-tools/resources/recommendations-space-system-operators-improving-cybersecurity}
 }
 
-@inproceedings{koisser2024,
-  author    = {Koisser, David and others},
-  title     = {[TITLE TO CONFIRM] On the localization of satellite
-               internet terminals},
-  booktitle = {[VENUE TO CONFIRM]},
-  year      = {2024},
-  note      = {VERIFY EVERYTHING. Supports the uplink-geolocation threat
-              that motivates the orbital observer vantage.}
-}
-
-@misc{yue2023,
-  author = {Yue, [GIVEN NAME] and others},
-  title  = {[TITLE TO CONFIRM] Uplink jamming of satellite links},
-  year   = {2023},
-  note   = {VERIFY EVERYTHING -- this entry is a stub from working notes.}
-}
-
-@misc{zhang2025,
-  author = {Zhang, [GIVEN NAME] and others},
-  title  = {[TITLE TO CONFIRM] Large-scale analysis of satellite
-            downlink exposure},
-  year   = {2025},
-  note   = {VERIFY EVERYTHING -- this entry is a stub from working notes.}
-}
-
-@misc{benyahia,
-  author = {Ben Yahia, Ons and others},
-  title  = {[TITLE TO CONFIRM] Survey of satellite communication
-            security by segment},
-  year   = {2023},
-  note   = {VERIFY EVERYTHING. Cited for the space/ground/link/user
-            segment decomposition.}
-}
-
-@article{ma2018,
-  author  = {Ma, Jianjun and Shrestha, Rabi and Adelberg, Jacob and
-             Yeh, Chia-Yi and Hossain, Zahed and Knightly, Edward and
-             Jornet, Josep Miquel and Mittleman, Daniel M.},
-  title   = {Security and eavesdropping in terahertz wireless links},
-  journal = {Nature},
-  year    = {2018},
-  note    = {VERIFY volume/pages/DOI. This is the scatterer
-            counterexample -- narrow beams are interceptable via
-            scattering objects. Central to the argument that vacuum
-            propagation makes optical inter-satellite links different.}
+@misc{remy2026systematictaxonomyattacksspace,
+      title={Towards a Systematic Taxonomy of Attacks against Space Infrastructures}, 
+      author={Jose Luis Castanon Remy and Shouhuai Xu},
+      year={2026},
+      eprint={2512.12829},
+      archivePrefix={arXiv},
+      primaryClass={cs.CR},
+      url={https://arxiv.org/abs/2512.12829}, 
 }
 
 % ---- visualization ------------------------------------------------
 
-@inproceedings{ghoniem2004,
-  author    = {Ghoniem, Mohammad and Fekete, Jean-Daniel and
-               Castagliola, Philippe},
-  title     = {A Comparison of the Readability of Graphs Using Node-Link
-               and Matrix-Based Representations},
-  booktitle = {IEEE Symposium on Information Visualization (InfoVis)},
-  year      = {2004},
-  note      = {VERIFY pages/DOI. Supports the choice of a matrix over a
-              node-link representation for dense graphs.}
-}
-
-@misc{n2chart,
-  author = {[TO FIND]},
-  title  = {[TO FIND] Design structure matrix / $N^2$ chart in systems
-            engineering},
-  year   = {[TO FIND]},
-  note   = {NEEDED: a citable source for the square same-axis matrix
-            convention. Steward's original design structure matrix work
-            (1981) or Eppinger \& Browning's DSM book are the usual
-            choices. Pick one and verify.}
-}
-
-@misc{curvedmatrix,
-  author = {[TO FIND]},
-  title  = {[TO FIND] 3D or curved adjacency matrix layouts},
-  year   = {[TO FIND]},
-  note   = {NEEDED: prior work on 3D/curved matrix layouts. Search
-            "matrix cube", "curved matrix layout", "3D adjacency
-            matrix". If the literature finds 3D matrix layouts worse
-            than 2D, cite it and answer it directly in Section IV-B --
-            do not omit it.}
-}
-
-@misc{physec,
-  author = {[TO FIND]},
-  title  = {[TO FIND] Physical-layer security objectives survey},
-  year   = {[TO FIND]},
-  note   = {NEEDED: a citable source for the LPD/LPI/LPE/AJ/TFS
-            objective vocabulary adopted as the objective facet.}
-}

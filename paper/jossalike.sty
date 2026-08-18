@@ -1,0 +1,182 @@
+%% ===================================================================
+%%  jossalike.sty -- a sidebar-and-single-column article layout in the
+%%  visual idiom of the Journal of Open Source Software.
+%%
+%%  This is an INDEPENDENT re-implementation of that layout. It ships
+%%  no JOSS branding: no logo, no journal name, no DOI prefix. Every
+%%  masthead and metadata field below is a macro with a placeholder
+%%  default that you are expected to overwrite. Do not fill them with
+%%  JOSS's values unless the paper has actually been published there.
+%%
+%%  Engine: pdflatex (also fine under xelatex/lualatex).
+%%  Usage:  \usepackage{jossalike}
+%% ===================================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{jossalike}[2026/08/18 v1.0 JOSS-like sidebar layout]
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[default,scale=0.97]{sourcesanspro}
+\RequirePackage{microtype}
+\RequirePackage{xcolor}
+\RequirePackage{graphicx}
+\RequirePackage{eso-pic}
+\RequirePackage{fancyhdr}
+\RequirePackage{enumitem}
+\RequirePackage{titlesec}
+\RequirePackage{caption}
+\RequirePackage{booktabs}
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage[round]{natbib}
+\RequirePackage{hyperref}
+
+% ---- page geometry -------------------------------------------------
+%  Measured off a JOSS page: the body column is pushed right to clear a
+%  fixed-width metadata sidebar that only page 1 actually fills. Later
+%  pages keep the same measure so the column never shifts.
+\RequirePackage[a4paper,
+  top=1.42in, bottom=1.05in, left=2.32in, right=0.62in,
+  headheight=0.86in, headsep=0.30in, footskip=0.52in]{geometry}
+
+% ---- palette -------------------------------------------------------
+\definecolor{jaLink}{HTML}{1B6AC9}   % hyperlink / citation blue
+\definecolor{jaRule}{HTML}{000000}   % hairlines around sidebar blocks
+\definecolor{jaText}{HTML}{000000}
+
+\hypersetup{
+  colorlinks = true,
+  allcolors  = jaLink,
+  breaklinks = true,
+  pdfborder  = {0 0 0}
+}
+
+% ---- body text -----------------------------------------------------
+\linespread{1.10}\selectfont
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55\baselineskip}
+\setcounter{secnumdepth}{0}          % JOSS headings are unnumbered
+\sloppy
+
+% ---- headings ------------------------------------------------------
+\titleformat{\section}{\bfseries\Large}{}{0pt}{}
+\titlespacing*{\section}{0pt}{1.5\baselineskip}{0.35\baselineskip}
+\titleformat{\subsection}{\bfseries\large}{}{0pt}{}
+\titlespacing*{\subsection}{0pt}{1.1\baselineskip}{0.25\baselineskip}
+\titleformat{\subsubsection}{\bfseries\normalsize}{}{0pt}{}
+\titlespacing*{\subsubsection}{0pt}{0.9\baselineskip}{0.2\baselineskip}
+
+\captionsetup{font=footnotesize,labelfont=bf,labelsep=colon,
+              justification=justified,skip=6pt}
+
+% ====================================================================
+%  METADATA -- override every one of these in your document preamble.
+% ====================================================================
+\newcommand{\japlaceholder}[1]{\textcolor{red}{#1}}
+
+\newcommand{\journalmasthead}{%
+  {\fontsize{30}{32}\selectfont\bfseries \japlaceholder{VENUE}}\\[3pt]
+  {\footnotesize\japlaceholder{Set \textbackslash journalmasthead --
+   text, or \textbackslash includegraphics of your own logo.}}}
+
+\newcommand{\paperdoi}{\japlaceholder{10.xxxxx/xxxxx}}
+\newcommand{\paperdoiurl}{}
+\newcommand{\softwarereview}{}
+\newcommand{\softwarerepo}{}
+\newcommand{\softwarearchive}{}
+\newcommand{\handlingeditor}{\japlaceholder{unassigned}}
+\newcommand{\handlingeditorurl}{}
+\newcommand{\reviewerlist}{}
+\newcommand{\datesubmitted}{\japlaceholder{DD Month YYYY}}
+\newcommand{\datepublished}{\japlaceholder{DD Month YYYY}}
+\newcommand{\licensenote}{%
+  Authors of papers retain copyright and release the work under a
+  Creative Commons Attribution 4.0 International License
+  (\href{https://creativecommons.org/licenses/by/4.0/}{CC BY 4.0}).}
+
+% Footer citation line: \jafootline is the "Author et al., (Year). Title."
+% half; \jafootsource is the "Venue, vol(iss), id. DOI" half.
+\newcommand{\jafootline}{\japlaceholder{Author et al., (Year). Title.}}
+\newcommand{\jafootsource}{\japlaceholder{\textit{Venue}, vol(iss), id.}}
+
+% Title block
+\newcommand{\papertitle}{\japlaceholder{Title}}
+\newcommand{\paperauthors}{\japlaceholder{Authors}}
+\newcommand{\paperaffiliations}{\japlaceholder{Affiliations}}
+
+% ---- running header / footer ---------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[L]{\hspace*{-1.70in}\parbox[t]{4in}{\journalmasthead}}
+\fancyfoot[L]{%
+  \hspace*{-1.70in}%
+  \parbox[t]{\dimexpr\textwidth+1.70in\relax}{\footnotesize
+    \parbox[t]{\dimexpr\textwidth+1.70in-1.6em\relax}{\raggedright\jafootline}%
+    \hfill\makebox[1.2em][r]{\thepage}\\[1pt]
+    \jafootsource}}
+
+% ---- sidebar -------------------------------------------------------
+\newlength{\jasidebarwidth}\setlength{\jasidebarwidth}{1.78in}
+\newcommand{\jasidebarrule}{\par\vspace{4pt}%
+  {\color{jaRule}\hrule height 0.4pt}\par\vspace{4pt}}
+
+% one bulleted link list item; skipped silently if the URL is empty
+\newcommand{\jalinkitem}[2]{%
+  \ifx\relax#2\relax\else\item \href{#2}{#1}\fi}
+
+\newcommand{\jasidebarcontent}{%
+  \footnotesize\raggedright
+  \jasidebarrule
+  \textbf{DOI:}~\ifx\paperdoiurl\empty \paperdoi \else
+    \href{\paperdoiurl}{\paperdoi}\fi\par
+  \vspace{4pt}
+  \textbf{Software}
+  \begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=2pt,parsep=0pt]
+    \jalinkitem{Review}{\softwarereview}
+    \jalinkitem{Repository}{\softwarerepo}
+    \jalinkitem{Archive}{\softwarearchive}
+  \end{itemize}
+  \jasidebarrule
+  \textbf{Editor:}~\ifx\handlingeditorurl\empty \handlingeditor \else
+    \href{\handlingeditorurl}{\handlingeditor}\fi\par
+  \vspace{3pt}
+  \textbf{Reviewers:}
+  \ifx\reviewerlist\empty
+    \par\japlaceholder{none listed}\par
+  \else
+    \begin{itemize}[leftmargin=1.1em,itemsep=1pt,topsep=2pt,parsep=0pt]
+      \reviewerlist
+    \end{itemize}
+  \fi
+  \jasidebarrule
+  \textbf{Submitted:}~\datesubmitted\par
+  \textbf{Published:}~\datepublished\par
+  \vspace{5pt}
+  \textbf{License}\par
+  \licensenote\par}
+
+% Drop the sidebar onto the current page only.
+\newcommand{\makesidebar}{%
+  \AddToShipoutPictureFG*{%
+    \AtPageUpperLeft{%
+      \put(\LenToUnit{0.42in},\LenToUnit{-3.02in}){%
+        \begin{minipage}[t]{\jasidebarwidth}\jasidebarcontent\end{minipage}}}}}
+
+% ---- title block ---------------------------------------------------
+\renewcommand{\maketitle}{%
+  \thispagestyle{fancy}%
+  \vspace*{-0.30in}%
+  {\raggedright\fontsize{17}{22}\selectfont \papertitle\par}
+  \vspace{10pt}
+  {\raggedright\fontsize{12}{16}\selectfont\bfseries \paperauthors\par}
+  \vspace{7pt}
+  {\raggedright\footnotesize \paperaffiliations\par}
+  \vspace{6pt}
+  \makesidebar}
+
+% ---- sidebar bullet glyph, matching the reference layout -----------
+\renewcommand{\labelitemi}{\raisebox{0.15ex}{\tiny$\blacksquare$}}
+
+\endinput

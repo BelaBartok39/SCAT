@@ -33,40 +33,20 @@
 
 \begin{document}
 
-\title{Penumbra: An Interactive Relational Taxonomy \\ of Radio-Frequency Signal Security}
+\title{SigVault: An Interactive Relational Taxonomy \\ of RF Signal Security in Space Communications}
 
 \author{%
-  \IEEEauthorblockN{Author One and Author Two}%
-  \thanks{Manuscript submitted \today. Authors are with [Institution].}%
+\IEEEauthorblockN{Nicholas D. Redmond, Dipankar Dasgupta}\\
+\IEEEauthorblockA{University of Memphis, Department of Computer Science\\
+Memphis, TN, USA\\
+Email: \{ndrdmond@memphis.edu, ddasgupt@memphis.edu\} }
 }
-
-\markboth{IEEE Transactions on Visualization and Computer Graphics (draft)}%
-{Author \MakeLowercase{\textit{et al.}}: Penumbra: An Interactive Relational Taxonomy of RF Signal Security}
 
 \maketitle
 
 % ====================================================================
 \begin{abstract}
-Knowledge about the security of radio-frequency (RF) links is fragmented
-across communities that rarely share vocabulary: electronic warfare,
-satellite systems engineering, physical-layer security, and mission cyber
-defence. Existing reference knowledge bases operate either at the mission
-and spacecraft level or at the enterprise-network level, leaving the
-signal itself---its band, waveform, antenna, propagation environment, and
-the attacks and mitigations that attach to each---without a navigable
-structure. We present Penumbra, an interactive relational taxonomy in
-which eleven signal-security facets are crossed with one another to yield
-a matrix of relation types, rendered on a rotatable cylindrical surface
-whose wrapped axis encodes the countermeasure lifecycle. Three coupled
-drill-down views---a ground-to-orbit transmission-security diorama, a
-device-level kill-chain scene, and a waveform laboratory---are projections
-of the same underlying entity graph, so that a relation selected in one
-view can be opened in another. Cell colour encodes evidence density rather
-than identity, which makes the surface simultaneously a reference and a
-map of where the literature is thin. We describe the taxonomy structure,
-the visual encoding and its rejected alternatives, the provenance
-discipline governing ingest of external knowledge bases, and an evaluation
-plan.
+The literature on radio-frequency (RF) security is fragmented across terrestrial and orbital domains and often confined to the specific time it was written, moving slower than the attack surface is expanding. With AI pushing the frontiers of signal exploitation and serious hardware becoming cheaper and more accessible, the need for a modern and live taxonomy of RF Signal Security is obvious. We present SigVault, an interactive relational taxonomy in which knowledge of RF security becomes more accessible and engaging than ever before. Featured is a matrix of eleven signal-security facets as they relate to one another, rendered on a rotatble surface intended to map the literature in a way that is both navigatable and visually pleasing. Additionally, three coupled drill-down views are provided to allow users to visualize and interact with the details of the taxonomy in a memorable way. These views are named for their domain and purpose: TRANSEC, COMSEC, and our proprietary Signal Lab. This taxonomy is designed to reference the literature as well as map the research gaps in the field, shortening the time it takes to even find open problems. It is intended to be a living document that will continue to grow with the field which is essentialy in a time where AI advances are so rapid that the domain has changed before the academic journals can review and publish the findings.   
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -92,98 +72,17 @@ satellite systems engineering, in physical-layer security, and in mission
 cyber defence, and each community has its own vocabulary, its own
 canonical threats, and its own reference documents.
 
-The consequence is practical. An analyst who wants to know which antenna
-architectures are commonly paired with a given protocol, or which
-waveforms in deployed use actually achieve a low probability of detection,
-or which mitigations have been demonstrated against follower jamming,
-must assemble the answer from sources that do not cite one another. A
-student encountering the field has no structure into which individual
-facts can be placed.
 
-\guide{Ground this paragraph in a concrete anecdote you can defend---the
-Viasat/AcidRain 2022 event, the Baltic GNSS interference campaign, or the
-public reverse-engineering of Starlink downlink framing. One real incident
-that required knowledge from three of the four communities is worth more
-than a general claim about fragmentation.}
-
-Existing structured knowledge bases do not fill this gap, because they
-were built for adjacent problems. SPARTA \needcite{} catalogues
-adversary tactics against space systems at the mission and spacecraft
-level. MITRE ATT\&CK \needcite{} and CAPEC \needcite{} operate on
-enterprise and application software. Surveys of satellite security
-\needcite{} organise the field into segments---space, ground, link, user---
-but treat the link segment as a single element rather than a structure.
-None of them can answer a question that crosses two signal-domain
-properties, because none of them represents signal-domain properties as
-first-class entities that can be crossed.
-
-We take the position that the missing artefact is \emph{relational}. The
-useful unit of knowledge in this domain is not a fact about a band or a
-fact about a modulation, but a fact about the relationship between a band
-and a modulation---or between an antenna and a protocol, or between an
-attack and a mitigation. A taxonomy of RF signal security should therefore
-be a structure over pairs, not a list of items.
-
-\medskip\noindent\textbf{Contributions.}
-\begin{enumerate}
-  \item A relational taxonomy of RF signal security comprising eleven
-        facets crossed with one another, yielding fifty-five distinct
-        relation types, of which one---band crossed with security
-        objective---is instantiated in full depth as an existence proof.
-  \item A visual encoding for facet-by-facet relations on a cyclic
-        surface, in which hue carries facet family, luminance carries
-        evidence density, and a fixed pair readout replaces
-        header-tracing. We report the alternatives we rejected and why.
-  \item An interactive instrument comprising four coupled views over a
-        single entity graph, in which a relation selected in one view can
-        be opened in the others.
-  \item A curated crosswalk from mission-level space adversary techniques
-        to physical-layer signal facets, together with a provenance
-        discipline for ingesting third-party knowledge bases
-        reproducibly.
-\end{enumerate}
-
-\guide{Contribution 4 is the one most likely to be questioned as
-derivative. Defend it as \emph{a mapping nobody has published}, not as
-\emph{we imported SPARTA}. If the crosswalk ends up smaller than about
-twenty-five rows, demote it from a contribution to a subsection.}
 
 % ====================================================================
 \section{Related Work}
 
 \subsection{Structured Adversary Knowledge Bases}
-SPARTA \needcite{} is the closest reference artefact in the space domain,
-enumerating tactics and techniques against spacecraft, ground segments,
-and their interfaces. Its unit of analysis is the mission: a technique
-describes what an adversary does to a system. ATT\&CK \needcite{} and
-CAPEC \needcite{} play the equivalent role for enterprise software and
-application-layer attack patterns respectively.
+SPARTA
 
-These knowledge bases are complementary to ours rather than competitive,
-and the boundary is worth stating precisely: they enumerate adversary
-behaviour, whereas we structure the signal-domain properties that
-determine whether such behaviour is feasible. A technique such as
-``intercept the downlink'' appears in SPARTA as an action; in our
-taxonomy the corresponding entry is the set of relations between the
-band, the modulation, the antenna geometry, and the framing that jointly
-decide whether interception succeeds.
-
-\guide{This paragraph is the paper's most important defensive move. A
-reviewer who works on SPARTA will read the paper looking for evidence that
-you are re-labelling their work. Make the distinction operational, not
-rhetorical: give one example where our structure yields an answer SPARTA
-structurally cannot.}
 
 \subsection{Surveys and Taxonomies of Satellite and PHY Security}
-Tedeschi \emph{et al.} \needcite{} and Ben Yahia \emph{et al.}
-\needcite{} survey satellite communication security and decompose systems
-into segments. Pavur \emph{et al.} \needcite{} demonstrate large-scale
-cleartext recovery from commercial satellite downlinks; Humphreys
-\emph{et al.} \needcite{} characterise LEO downlink framing from
-third-party observation. Physical-layer security research \needcite{}
-supplies the objective vocabulary---low probability of detection,
-interception, and exploitation; anti-jam; traffic-flow security---that we
-adopt as one of our eleven facets.
+
 
 Two limitations recur. First, these treatments are largely
 orbit-agnostic, which understates how strongly the threat model depends
@@ -192,34 +91,12 @@ they contain cannot be queried along an axis the author did not
 anticipate.
 
 \subsection{Matrix and Adjacency Visualization}
-Our central view is an adjacency matrix over a facet set. Matrix
-representations are known to outperform node-link diagrams for dense
-graphs on most topology-reading tasks, while losing to them on path
-following \needcite{}. Since our analytic tasks are lookup and
-comparison rather than path following, the matrix is the appropriate
-base representation.
 
-The design-structure-matrix and $N^2$-chart traditions in systems
-engineering \needcite{} supply the specific convention we adopt: a square
-matrix whose rows and columns are the same list, so that every cell is a
-relation between two elements of one set.
-
-\guide{You need one or two citations for 3D and curved matrix layouts,
-and you should expect a reviewer to ask whether the cylinder is
-gratuitous. Search terms: ``curved matrix layout'', ``3D adjacency
-matrix'', ``matrix cube''. If the honest answer is that prior work found
-3D matrix layouts \emph{worse}, cite it and answer it directly in
-Section~IV-B rather than hoping it is missed.}
 
 % ====================================================================
 \section{Taxonomy Structure}
 
 \subsection{Facets}
-The taxonomy is built from eleven facets, listed in Table~\ref{tab:facets}
-and grouped into six families. Ten are drawn from the vocabulary of RF
-systems engineering; the eleventh, \emph{objective}, is the
-physical-layer security objective set, and is what makes the structure a
-security taxonomy rather than a systems reference.
 
 \begin{table}[t]
 \caption{The eleven facets and their families. Family membership drives
@@ -246,217 +123,43 @@ Limitation   & Residual   & PAPR cost, acquisition delay \\
 \end{tabular}
 \end{table}
 
-\guide{Facet selection is a methodological claim and reviewers will press
-on it. Say how the eleven were derived---inductively from coding a corpus
-of $n$ papers, or deductively from an existing systems-engineering
-breakdown---and state the stopping criterion. ``It came from a whiteboard
-sketch'' is true but not publishable; ``we coded $n$ sources until no new
-facet appeared in the last $k$'' is both.}
 
 \subsection{Relations as the Unit of Knowledge}
-Because rows and columns are drawn from the same facet list, the matrix
-is square and symmetric: the cell at (antenna, protocol) and the cell at
-(protocol, antenna) denote the same relation read from opposite ends. We
-author each relation once and derive its transpose, which reduces the
-authoring surface from $121$ cells to $\binom{11}{2}=55$ distinct
-relation types. The diagonal is excluded by definition: a facet crossed
-with itself is a glossary entry, not a relation.
 
-Each relation instance carries a set of concrete pairs, a maturity
-assessment, free-text justification, and citations. A cell is therefore a
-\emph{set}, not a value---a fact with direct consequences for the visual
-encoding, developed in Section~\ref{sec:vis}.
 
 \subsection{Evidence Density}
-\label{sec:evidence}
-Each relation carries a scalar $e \in [0,1]$ expressing how well that
-relation is covered by the literature and by our own dataset. This
-quantity, not relation identity, is what cell colour encodes.
 
-\guide{\textbf{This subsection is the paper's methodological weak point
-and you must not leave it as written.} A reviewer will ask exactly how $e$
-is computed, and ``curatorial judgement'' will not survive. Pick one and
-operationalise it:
-(i)~a normalised count of distinct peer-reviewed sources meeting a stated
-inclusion criterion;
-(ii)~an ordinal rubric (0--4) with published anchor descriptions, coded by
-two raters with a reported agreement statistic such as Cohen's $\kappa$ on
-a sample of cells;
-(iii)~a bibliometric measure computed from a frozen corpus.
-Option (ii) is the cheapest defensible choice. Whatever you choose,
-report inter-rater agreement---it converts the entire colour channel from
-opinion into measurement, and it is the single highest-value experimental
-investment in this paper.}
 
 % ====================================================================
 \section{Visual Design}
 \label{sec:vis}
 
 \subsection{Requirements}
-The design is driven by five requirements derived from the structure
-above and from feedback on an earlier single-view prototype:
-\textbf{R1}, support lookup of an arbitrary facet pair;
-\textbf{R2}, expose coverage so that absence of knowledge is visible
-rather than indistinguishable from absence of display;
-\textbf{R3}, preserve orientation while navigating a $121$-cell surface
-that carries no cell text;
-\textbf{R4}, remain legible under both light and dark presentation and in
-greyscale print, since figures are extracted for publication;
-\textbf{R5}, couple to the detail views so that a relation can be
-inspected in its native representation.
+
 
 \subsection{A Cyclic Axis}
-The column order is not arbitrary. Reading around the surface:
-protocol, band, modulation, antenna, propagation, noise, attack,
-objective, mitigation, limitation, use-case, and back to protocol. This
-is the countermeasure lifecycle---a design is allocated spectrum, encoded,
-radiated, propagated, corrupted, attacked, defended, and limited, and
-those limitations constrain the use-cases that drive the next design
-generation.
 
-Wrapping the axis is legitimate precisely because it closes. The
-cylindrical presentation asserts that the ordering has no origin and no
-terminus, which is a claim about the domain rather than a stylistic
-choice; the arms-race framing is normally asserted in prose and never
-shown. Highlighting a row lifts the far wall of the surface so that the
-band is visibly continuous around the cylinder, making the closure
-observable rather than merely stated.
-
-\guide{Be prepared to abandon this. If the cyclic ordering cannot be
-defended in review---and it is the load-bearing justification for the
-entire 3D presentation---the honest fallback is the flat matrix, which
-the tool already supports as a first-class mode. Write the paper so that
-losing the cylinder costs you one subsection and one figure, not the
-contribution.}
 
 \subsection{Encoding}
-Position identifies a cell: its row and column are given by where it is.
-We therefore spend colour on what position cannot convey. Hue carries
-facet family---six groups rather than eleven, a count within the range
-over which categorical colour remains discriminable---and provides
-orientation while the surface rotates. Luminance carries evidence density
-on a single sequential ramp, which survives colour-vision deficiency and
-greyscale reproduction (\textbf{R4}) and directs attention to where
-substance lies (\textbf{R2}).
+
 
 \subsubsection*{Rejected: identity as a colour blend}
-An earlier design encoded cell identity as a blend of a row colour and a
-column colour. We rejected it for three reasons, recorded here because
-the reasoning generalises to any square-matrix encoding. First, colour
-mixtures cannot be inverted perceptually: an observer shown a blend does
-not recover its components, and shading across a curved surface perturbs
-apparent hue further. Second, the scheme requires $121$ discriminable
-blends generated from $11 \times 11$ parents that must themselves be
-discriminable, and those two requirements are in direct tension. Third
-and decisively, it spends the only free visual channel on information
-that position already supplies, leaving a text-free surface with no
-information scent---every cell equally featureless, and exploration
-reduced to guesswork.
 
-\guide{Design papers are strengthened, not weakened, by reporting
-rejected alternatives. Keep this subsection. If you run the expert
-walkthrough proposed in Section~VII, ask one participant to compare the
-two encodings directly; a single comparative observation converts this
-from argument into evidence.}
 
 \subsection{Interaction}
-Cells carry no text; selecting one opens a modal containing the pair
-list, evidence, citations, and links into the detail views. Removing text
-from the surface eliminates glyph distortion under curvature entirely.
 
-Orientation (\textbf{R3}) is maintained by a crosshair: hovering or
-focusing a cell illuminates the full row band and column stripe and
-prints the pair name in a fixed readout that never moves. This is
-deliberately not header-tracing. Curvature actively degrades tracing,
-because column lines converge toward the silhouette; the fixed readout
-sidesteps the task rather than competing with it.
 
-Column labels persist around the entire circumference, with blur and
-opacity ramped by depth, so that a label on the far side is present but
-unresolvable until it rotates forward. Nothing is hidden; resolution is
-deferred.
 
-Finally, an unroll control interpolates the cylinder into a flat grid
-with identical data and identical cells. The cylinder supports
-orientation and the argument about cyclicity; the grid supports
-comparison of distant columns, which curvature makes impossible.
-
-\begin{figure}[t]
-  \centering
-  \fbox{\parbox[c][3.4cm][c]{0.92\columnwidth}{\centering\footnotesize
-    \textit{Figure placeholder}\\[2pt]
-    Home view: the facet matrix on the cylinder, crosshair active,
-    far wall visible.}}
-  \caption{The Home view. Hue encodes facet family, luminance encodes
-  evidence density. The illuminated row is visibly continuous around the
-  far wall, showing the axis closing.}
-  \label{fig:home}
-\end{figure}
-
-\guide{Figure budget for five pages: Fig.~1 the cylinder with crosshair;
-Fig.~2 a two-panel cylinder/unrolled comparison (this is your strongest
-single image); Fig.~3 the four-view architecture; Fig.~4 one detail view,
-probably the GNSS spoofing scenario. Export from the tool in light mode;
-the palette was designed so that light mode is print-ready.}
 
 % ====================================================================
 \section{System Architecture}
 
 \subsection{One Graph, Four Projections}
-All four views are reads of a single entity graph. Nodes are facet
-members; edges are relation instances. Critically, graph edges are
-\emph{derived} from the authored relation records rather than stored
-separately---in an earlier iteration, every integration defect we
-encountered arose from two tables that were independently correct but had
-drifted apart.
 
-The four views are: \textbf{Home}, the facet matrix described above;
-\textbf{TRANSEC}, a ground-to-orbit scene with emitters, orbital regimes,
-and a draggable observer that reports whether a link is exposed,
-detectable as energy only, or hidden; \textbf{COMSEC}, a device-level
-scene in which selecting an attack illuminates its kill chain across
-terminal, modem, cryptographic unit, teleport, and backhaul; and
-\textbf{Signal Lab}, a waveform laboratory presenting constellation,
-spectrum, eye, waterfall, and spreading views over a tested
-signal-processing core, with adversary controls for barrage,
-partial-band, and follower jamming.
-
-Coupling is the point (\textbf{R5}): a cell in Home opens the
-corresponding kill chain in COMSEC, and a modulation in either opens in
-Signal Lab with the relevant scheme loaded.
-
-\guide{Say explicitly why COMSEC is present, since it overlaps SPARTA's
-territory. The defensible framing: SPARTA enumerates techniques but does
-not show them propagating through concrete equipment. The visualization is
-the contribution; the COMSEC taxonomy is not.}
 
 \subsection{Provenance and Reproducibility}
-External knowledge bases are ingested offline and their normalised output
-is committed to the repository with per-record provenance and retrieval
-date. Nothing is fetched at runtime. Three reasons motivate this:
-a reviewer must be able to rebuild the artefact and obtain the same
-matrix; a static deployment has no server on which to proxy
-cross-origin requests or rate limits; and licensing attribution remains
-auditable.
-
-The mapping from SPARTA techniques to signal facets is hand-curated, not
-automated. The two schemes operate at different levels of abstraction,
-and most mission-level techniques have no physical-layer correlate; an
-automated join produces plausible-looking but spurious entries, which are
-worse than absent ones because they are invisible.
-
-\guide{State the licence position for each external source explicitly in
-a table---name, licence, what you import, what you do not. For SPARTA in
-particular, confirm terms before submission: cite technique identifiers
-and link outward, author original descriptions, and do not mirror text.}
 
 \subsection{Implementation}
-The tool is a client-side TypeScript application. The three-dimensional
-scenes use WebGL; the laboratory views are Canvas2D renderers over a
-signal-processing core with unit tests and no user-interface coupling.
-All application state, including the selected facet pair, is encoded in
-the URL, so that any view state is deep-linkable and directly citable.
-The artefact deploys as static files.
 
 % ====================================================================
 \section{Usage Scenarios}
@@ -467,105 +170,29 @@ and each should end with an answer the reader could not have obtained
 from the sources cited in Section~II.}
 
 \subsection{Locating a Research Gap}
-An analyst opens the Home view and observes that relations involving the
-inter-satellite-link facet are uniformly low in evidence density, while
-relations among band, modulation, and objective are dense. The surface has
-functioned as a map of the literature rather than only as a reference: the
-sparse region is a research agenda. Selecting one such relation reveals
-the small number of citations backing it.
+
 
 \subsection{GNSS Spoofing}
-\needdata{} A user selects the GNSS civil signal and steps through
-authentic, meaconed, and synthetic conditions in Signal Lab, observing
-the correlation peak split and drag; enabling the navigation-message
-authentication mitigation restores it. Crossing back to Home, the
-objective row shows why the civil signal is structurally exposed---it has
-no user uplink, and therefore no challenge-response path---while the
-military signal's split-spectrum waveform is visible directly in the
-spectrum panel.
 
-\guide{This scenario is the strongest thing in the paper because it
-exercises the relational structure, the waveform library, and a live
-real-world problem simultaneously. Consider making it Section~VI in full
-and demoting the gap-finding scenario to a paragraph.}
 
 % ====================================================================
 \section{Evaluation Plan}
 
-\guide{\textbf{A tool paper without evaluation is rejected.} Decide now
-which of the following you will actually run, because the choice shapes
-what you must instrument before the study, not after. In descending order
-of credibility per unit of effort:}
-
 \subsection{Classroom Deployment}
-Deploy the tool in a course covering satellite or wireless security and
-collect pre- and post-instruction comprehension measures, with a
-comparison condition using conventional materials. This is the most
-achievable design and yields the strongest claim.
 
 \subsection{Expert Walkthrough}
-Structured think-aloud sessions with practitioners from the SIGINT,
-electronic-warfare, and satellite-operations communities, coded for
-breakdowns in orientation, encoding interpretation, and cross-view
-navigation. Six to eight participants is conventional.
 
 \subsection{Task-Based Study}
-Timed lookup and comparison tasks with and without the tool. This is also
-the natural setting for the one controlled comparison the visual design
-demands: cylinder versus unrolled grid, on tasks requiring comparison of
-distant columns.
-
-\guide{Run that cylinder-versus-grid comparison even if you run nothing
-else. It is the empirical answer to the objection your central design
-choice invites, and if the cylinder loses on comparison tasks but wins on
-orientation and engagement, that is a publishable and honest result---not
-a failure.}
 
 \subsection{Case-Study Validation}
-Reproduce documented incidents end to end and show that the model
-accounts for them. This is cheap, requires no participants, and
-demonstrates coverage.
 
 % ====================================================================
 \section{Limitations}
 
-\textbf{Coverage is bounded by curation.} The taxonomy reflects the
-literature the authors reached. Evidence density therefore measures our
-corpus, not the field, and must be reported as such.
-
-\textbf{Occlusion.} The cylinder shows roughly half the matrix at once.
-The unrolled mode mitigates this, but the default view does withhold
-information, and the far wall is deliberately illegible.
-
-\textbf{The cyclic ordering is argued, not derived.} It is a defensible
-reading of the countermeasure lifecycle, not a result. Alternative
-orderings exist and would produce a different adjacency structure.
-
-\textbf{Symmetry is an assumption.} Treating (A,~B) and (B,~A) as one
-relation presumes the relationship is not directional. For most facet
-pairs this holds; for attack and mitigation it is arguable.
-
-\guide{Adding a fifth limitation you have actually encountered---rather
-than one you anticipate---raises reviewer confidence measurably. The
-camera-tilt finding from the prototype is a genuine candidate: at a steep
-viewing angle the offset between a row's silhouette and its front face
-exceeded one row height and the display was misread. It is a small,
-concrete, honest observation about curved matrix layouts.}
 
 % ====================================================================
 \section{Conclusion}
-We have presented a relational taxonomy of RF signal security in which
-the unit of knowledge is the crossing of two signal-domain facets rather
-than a single property, together with an interactive instrument that
-renders those crossings on a cyclic surface and couples them to three
-detail views over a shared entity graph. By encoding evidence density
-rather than identity, the artefact serves simultaneously as a reference
-and as a map of where knowledge is absent.
 
-\guide{Close on the gap map, not on the visualization. ``Here is what
-nobody has studied'' is a stronger and more durable claim than ``here is
-a new way to draw a matrix,'' and it is the claim your encoding uniquely
-supports.}
 
 % ====================================================================
 \section*{Acknowledgment}

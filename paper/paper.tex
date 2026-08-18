@@ -1,0 +1,303 @@
+%% ===================================================================
+%%  SigVault -- tool paper, JOSS-like layout.
+%%
+%%  Layout lives in jossalike.sty; this file is content only.
+%%  SKELETON / GUIDE DRAFT. Not submission copy.
+%%
+%%  Every \guide{...} block is scaffolding addressed to the author.
+%%  Set \showguidesfalse to hide them all and read the prose alone.
+%%
+%%  Build:  latexmk -pdf paper.tex
+%% ===================================================================
+
+\documentclass[10pt,a4paper]{article}
+\usepackage{jossalike}
+
+% ---- author-facing guidance ----------------------------------------
+\definecolor{guidecol}{HTML}{8A5A00}
+\newif\ifshowguides
+\showguidestrue                 % <-- \showguidesfalse to hide all guide notes
+\newcommand{\guide}[1]{%
+  \ifshowguides
+    {\par\smallskip\footnotesize\color{guidecol}%
+     \textbf{[guide]}~#1\par\smallskip}%
+  \fi}
+\newcommand{\needcite}{\textcolor{red}{[CITE]}}
+\newcommand{\needdata}{\textcolor{red}{[DATA]}}
+
+% Stand-in for a figure whose artwork does not exist yet.
+\newcommand{\figstub}[1]{%
+  \fbox{\parbox[c][1.55in][c]{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}%
+    {\centering\color{red}\footnotesize [FIGURE] #1}}}
+
+% ====================================================================
+%  MASTHEAD AND METADATA
+%  Every field below is a placeholder. Fill in the ones that become
+%  real; delete the sidebar blocks you will never have.
+% ====================================================================
+\renewcommand{\journalmasthead}{%
+  {\fontsize{30}{32}\selectfont\bfseries \japlaceholder{VENUE}}\\[3pt]
+  {\footnotesize\japlaceholder{Replace with the venue wordmark, or
+   \textbackslash includegraphics\{logo.pdf\}.}}}
+
+\renewcommand{\paperdoi}{\japlaceholder{10.xxxxx/xxxxxx}}
+\renewcommand{\paperdoiurl}{}
+\renewcommand{\softwarerepo}{https://github.com/\japlaceholder{org/sigvault}}
+\renewcommand{\softwarereview}{}
+\renewcommand{\softwarearchive}{}
+\renewcommand{\handlingeditor}{\japlaceholder{unassigned}}
+\renewcommand{\reviewerlist}{}
+\renewcommand{\datesubmitted}{\japlaceholder{DD Month 2026}}
+\renewcommand{\datepublished}{\japlaceholder{DD Month 2026}}
+
+\renewcommand{\jafootline}{Redmond \& Dasgupta, (2026). SigVault: An
+  Interactive Relational Taxonomy of RF Signal Security in Space
+  Communications.}
+\renewcommand{\jafootsource}{\japlaceholder{\textit{Venue}, vol(iss), id.}}
+
+\renewcommand{\papertitle}{SigVault: An Interactive Relational Taxonomy
+  of RF Signal Security in Space Communications}
+
+\renewcommand{\paperauthors}{Nicholas D. Redmond\textsuperscript{1},
+  Dipankar Dasgupta\textsuperscript{1}}
+
+\renewcommand{\paperaffiliations}{%
+  \textbf{1} Department of Computer Science, University of Memphis,
+  Memphis, TN, USA}
+
+\begin{document}
+\maketitle
+
+% ====================================================================
+\section{Summary}
+
+The literature on radio-frequency (RF) security is fragmented across
+terrestrial and orbital domains and often confined to the specific time
+it was written, moving slower than the attack surface is expanding. With
+AI pushing the frontiers of signal exploitation and serious hardware
+becoming cheaper and more accessible, the need for a modern and live
+taxonomy of RF Signal Security is obvious. We present SigVault, an
+interactive relational taxonomy in which knowledge of RF security becomes
+more accessible and engaging than ever before. Featured is a matrix of
+eleven signal-security facets as they relate to one another, rendered on
+a rotatable surface intended to map the literature in a way that is both
+navigable and visually pleasing. Additionally, three coupled drill-down
+views are provided to allow users to visualize and interact with the
+details of the taxonomy in a memorable way. These views are named for
+their domain and purpose: TRANSEC, COMSEC, and our Signal Lab. This
+taxonomy is designed to reference the literature as well as map the
+research gaps in the field, shortening the time it takes to even find
+open problems. It is intended to be a living document that will continue
+to grow with the field, which is essential in a time where AI advances
+are so rapid that the domain has changed before the academic journals can
+review and publish the findings.
+
+\guide{Trim to roughly 150--200 words before submission; the version
+above is long on purpose so you can cut rather than invent. The sentence
+that must survive intact is the one naming the contribution:
+\emph{crossing} facets that prior work treats separately. Three edits
+already applied from the IEEE draft: \emph{rotatble}/\emph{navigatable}/%
+\emph{essentialy} spellings, and ``our proprietary Signal Lab'' ---
+proprietary means closed and commercial, which contradicts the living,
+citable, open instrument the rest of this paragraph argues for.}
+
+% ====================================================================
+\section{Statement of Need}
+
+The security of a radio link is decided by properties that no single
+research community owns. Whether a transmission can be detected depends
+on its waveform and its antenna pattern; whether it can be exploited
+depends on its framing and its encryption; whether it can be denied
+depends on the geometry between transmitter, receiver, and adversary.
+These properties are studied in electronic warfare, in satellite systems
+engineering, in physical-layer security, and in mission cyber defence,
+and each community has its own vocabulary, its own canonical threats, and
+its own reference documents.
+
+\guide{This is the Introduction from the IEEE draft, carried over intact.
+In the JOSS idiom this section has one job: establish that a practitioner
+is currently blocked, and that no existing artifact unblocks them. The
+paragraph above sets up the fragmentation; it still needs the second
+half --- \emph{what a researcher cannot do today}, stated as a concrete
+failed task, and why the existing surveys and knowledge bases do not
+answer it.}
+
+\begin{figure}[t]
+  \centering
+  \figstub{Home view --- the eleven-facet N\textsuperscript{2} matrix
+    wrapped on the rotatable cylinder, with the crosshair and pair
+    readout active.}
+  \caption{\japlaceholder{Caption pending.} The Home view. Both axes
+    carry the same eleven facets, so every cell is a relation between two
+    facet types; column order follows the countermeasure loop, which is
+    what makes the axis cyclic and the surface closed.}
+  \label{fig:home}
+\end{figure}
+
+\guide{A tool paper in this format is carried by its figures --- the
+reference layout runs four across eight pages, each one load-bearing
+rather than decorative. Budget at least three: the Home cylinder
+(Figure~\ref{fig:home}), a crossing modal showing what a cell actually
+yields, and one drill-down view. Caption them so a reader who only
+looks at figures still gets the argument.}
+
+% ====================================================================
+\section{Related Work}
+
+\subsection{Structured Adversary Knowledge Bases}
+
+SPARTA \needcite{}
+
+\guide{\citet{remy2026systematictaxonomyattacksspace} is your closest
+neighbour and a reviewer will reach it before you name it. Distinguish
+explicitly and early: that work is a systematic taxonomy \emph{document}
+at the infrastructure level; this is a queryable relational
+\emph{instrument} at the physical layer. Say so in this subsection, not
+in Limitations.}
+
+\subsection{Surveys and Taxonomies of Satellite and PHY Security}
+
+Two limitations recur. First, these treatments are largely
+orbit-agnostic, which understates how strongly the threat model depends
+on regime. Second, they are organised as prose surveys, so the knowledge
+they contain cannot be queried along an axis the author did not
+anticipate.
+
+\subsection{Matrix and Adjacency Visualization}
+
+\guide{Cite the DSM/N\textsuperscript{2} chart convention and any prior
+work laying a matrix on a curved or 3D surface. If no such prior work
+exists, say that plainly --- it is a stronger sentence than a vague
+gesture at ``related visualization work''.}
+
+% ====================================================================
+\section{Taxonomy Structure}
+
+\subsection{Facets}
+
+\begin{table}[t]
+\caption{The eleven facets and their families. Family membership drives
+hue in the visual encoding.}
+\label{tab:facets}
+\centering
+\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Facet} & \textbf{Family} & \textbf{Example members} \\
+\midrule
+Protocol     & System     & DVB-S2X, Starlink Ku, GPS L1 \\
+Use-case     & System     & broadcast, TT\&C, backhaul \\
+Band         & Spectrum   & HF, L, S, X, Ku/Ka, mmWave, optical \\
+Modulation   & Spectrum   & BPSK, OQPSK, BOC(10,5), DSSS \\
+Antenna      & Physical   & helical, parabolic, phased array \\
+Propagation  & Physical   & vacuum, troposphere, multipath \\
+Noise        & Physical   & thermal, co-channel, intentional \\
+Attack       & Adversary  & intercept, follower jamming, meaconing \\
+Objective    & Defence    & LPD, LPI, LPE, AJ, TFS \\
+Mitigation   & Defence    & spreading, nulling, OSNMA \\
+Limitation   & Residual   & PAPR cost, acquisition delay \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Relations as the Unit of Knowledge}
+
+\subsection{Evidence Density}
+
+\guide{\textbf{Load-bearing, and currently unanswered.} Evidence density
+is the quantity the entire visual encoding maps to luminance, so ``how
+did you count?'' is the first question a reviewer asks. Three
+operationalisations are available: raw citation count per cell;
+normalised count against facet-pair prior; or an ordinal rubric
+(none~/~anecdotal~/~empirical~/~replicated). Recommend the ordinal
+rubric with two independent raters and a reported Cohen's~$\kappa$ ---
+it is the only option that survives the question ``why is this cell
+darker than that one?''}
+
+% ====================================================================
+\section{Visual Design}
+\label{sec:vis}
+
+\subsection{Requirements}
+
+\subsection{A Cyclic Axis}
+
+\guide{This subsection carries the cylinder. The claim is that column
+order follows the countermeasure loop --- Protocol $\to$ Band $\to$
+Modulation $\to$ Antenna $\to$ Propagation $\to$ Noise $\to$ Attack
+$\to$ Objective $\to$ Mitigation $\to$ Limitation $\to$ Use-case $\to$
+Protocol --- so the axis genuinely has no first element and a closed
+surface is the honest projection. If that ordering cannot be defended,
+the honest fallback is a flat matrix, and the paper is built so losing
+this argument costs one subsection rather than the contribution. Keep
+that property as you write.}
+
+\subsection{Encoding}
+
+\subsubsection{Rejected: identity as a colour blend}
+
+\subsection{Interaction}
+
+% ====================================================================
+\section{System Architecture}
+
+\subsection{One Graph, Four Projections}
+
+\subsection{Provenance and Reproducibility}
+
+\guide{State the snapshot-not-fetch policy here: external sources are
+version-pinned into the repository with a retrieval date rather than
+queried live, so a figure in this paper can be regenerated years from
+now. Name the snapshot commit. This is the subsection that earns the
+word ``living'' used in the Summary --- without it, the claim is
+decoration.}
+
+\subsection{Implementation}
+
+% ====================================================================
+\section{Usage Scenarios}
+
+\guide{Two scenarios is the right number at this length; three if you cut
+elsewhere. Each should be a task a real analyst has, not a feature tour,
+and each should end with an answer the reader could not have obtained
+from the sources cited in Related Work.}
+
+\subsection{Locating a Research Gap}
+
+\subsection{GNSS Spoofing}
+
+% ====================================================================
+\section{Evaluation Plan}
+
+\subsection{Classroom Deployment}
+
+\subsection{Expert Walkthrough}
+
+\subsection{Task-Based Study}
+
+\guide{\textbf{Load-bearing, and currently unrun.} There is no
+cylinder-versus-flat-grid comparison anywhere in this work. Until one
+exists, the curved surface is an aesthetic assertion. The minimum
+credible study is a within-subjects lookup task --- ``find the cell for
+facet~A~$\times$~facet~B'' --- timed on both layouts, and you should be
+willing to report the result even if the grid wins.}
+
+\subsection{Case-Study Validation}
+
+% ====================================================================
+\section{Limitations}
+
+% ====================================================================
+\section{Conclusion}
+
+% ====================================================================
+\section{Acknowledgements}
+
+The authors thank \needdata{}.
+
+% ====================================================================
+\nocite{*}   % remove once \needcite{} markers become real \cite{} calls
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\end{document}

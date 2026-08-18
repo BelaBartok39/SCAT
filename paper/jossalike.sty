@@ -74,10 +74,22 @@
 % ====================================================================
 \newcommand{\japlaceholder}[1]{\textcolor{red}{#1}}
 
-\newcommand{\journalmasthead}{%
+% Masthead. Set \institutionlogo to an image path to use artwork;
+% leave it empty and \mastheadwordmark is typeset instead. Prefer a
+% vector file (PDF/EPS) from your institution's brand portal -- it is
+% the approved artwork and it stays sharp at any size.
+\newcommand{\institutionlogo}{}
+\newcommand{\mastheadlogoheight}{0.60in}
+\newcommand{\mastheadwordmark}{%
   {\fontsize{30}{32}\selectfont\bfseries \japlaceholder{VENUE}}\\[3pt]
-  {\footnotesize\japlaceholder{Set \textbackslash journalmasthead --
-   text, or \textbackslash includegraphics of your own logo.}}}
+  {\footnotesize\japlaceholder{Set \textbackslash mastheadwordmark, or
+   point \textbackslash institutionlogo at an image file.}}}
+\newcommand{\journalmasthead}{%
+  \ifx\institutionlogo\empty
+    \mastheadwordmark
+  \else
+    \includegraphics[height=\mastheadlogoheight]{\institutionlogo}%
+  \fi}
 
 \newcommand{\paperdoi}{\japlaceholder{10.xxxxx/xxxxx}}
 \newcommand{\paperdoiurl}{}
@@ -89,6 +101,7 @@
 \newcommand{\reviewerlist}{}
 \newcommand{\datesubmitted}{\japlaceholder{DD Month YYYY}}
 \newcommand{\datepublished}{\japlaceholder{DD Month YYYY}}
+\newcommand{\extrasidebarblock}{}
 \newcommand{\licensenote}{%
   Authors of papers retain copyright and release the work under a
   Creative Commons Attribution 4.0 International License
@@ -150,6 +163,7 @@
       \reviewerlist
     \end{itemize}
   \fi
+  \extrasidebarblock
   \jasidebarrule
   \textbf{Submitted:}~\datesubmitted\par
   \textbf{Published:}~\datepublished\par

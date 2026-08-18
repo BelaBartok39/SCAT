@@ -35,10 +35,23 @@
 %  Every field below is a placeholder. Fill in the ones that become
 %  real; delete the sidebar blocks you will never have.
 % ====================================================================
-\renewcommand{\journalmasthead}{%
-  {\fontsize{30}{32}\selectfont\bfseries \japlaceholder{VENUE}}\\[3pt]
-  {\footnotesize\japlaceholder{Replace with the venue wordmark, or
-   \textbackslash includegraphics\{logo.pdf\}.}}}
+% ---- masthead ------------------------------------------------------
+% University of Memphis primary palette: University Blue PMS 287 C and
+% Memphis Gray PMS 423 C.
+\definecolor{uofmBlue}{HTML}{10498D}
+\definecolor{uofmGray}{HTML}{898D8D}
+
+% To use the real artwork instead of the wordmark below, download the
+% approved vector logo from memphis.edu/communications/brand, drop it
+% in this directory, and uncomment the next line:
+% \renewcommand{\institutionlogo}{uofm-logo.pdf}
+
+\renewcommand{\mastheadwordmark}{%
+  {\color{uofmBlue}\fontsize{19}{21}\selectfont\bfseries
+   UNIVERSITY OF MEMPHIS}\\[3pt]
+  {\color{uofmGray}\rule{2.55in}{0.6pt}}\\[3pt]
+  {\color{uofmBlue}\fontsize{10}{12}\selectfont
+   Center for Information Assurance}}
 
 \renewcommand{\paperdoi}{\japlaceholder{10.xxxxx/xxxxxx}}
 \renewcommand{\paperdoiurl}{}
@@ -47,6 +60,13 @@
 \renewcommand{\softwarearchive}{}
 \renewcommand{\handlingeditor}{\japlaceholder{unassigned}}
 \renewcommand{\reviewerlist}{}
+\renewcommand{\extrasidebarblock}{%
+  \jasidebarrule
+  \textbf{Lab}\par
+  \href{https://www.memphis.edu/cfia/}{Center for Information
+  Assurance (CfIA)}, University of Memphis --- a National Center of
+  Academic Excellence in Cybersecurity.\par}
+
 \renewcommand{\datesubmitted}{\japlaceholder{DD Month 2026}}
 \renewcommand{\datepublished}{\japlaceholder{DD Month 2026}}
 
@@ -62,8 +82,8 @@
   Dipankar Dasgupta\textsuperscript{1}}
 
 \renewcommand{\paperaffiliations}{%
-  \textbf{1} Department of Computer Science, University of Memphis,
-  Memphis, TN, USA}
+  \textbf{1} Center for Information Assurance (CfIA), Department of
+  Computer Science, University of Memphis, Memphis, TN, USA}
 
 \begin{document}
 \maketitle
@@ -293,7 +313,15 @@ willing to report the result even if the grid wins.}
 % ====================================================================
 \section{Acknowledgements}
 
-The authors thank \needdata{}.
+This work was carried out at the Center for Information Assurance
+(CfIA) at the University of Memphis, a National Center of Academic
+Excellence in Cybersecurity designated by the National Security Agency
+and the Department of Homeland Security. The authors thank \needdata{}.
+
+\guide{If any part of this work sits under a named CfIA grant --- the
+NCAE-C critical-infrastructure cybersecurity award, for instance ---
+name it and its number here. Funders generally require the
+acknowledgement, and reviewers read this section for conflicts.}
 
 % ====================================================================
 \nocite{*}   % remove once \needcite{} markers become real \cite{} calls

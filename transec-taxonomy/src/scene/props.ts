@@ -11,6 +11,7 @@
  */
 
 import * as THREE from 'three';
+import { SCENE, signalAlpha } from './palette';
 import type { BandId } from '../data/types';
 import { LAYER_HEIGHTS } from './layers';
 
@@ -27,20 +28,17 @@ export const RECEIVERS: Record<BandId, { pos: THREE.Vector3; label: string }> = 
   'satcom-military': { pos: new THREE.Vector3(90, 0, -250), label: 'ground station' },
 };
 
-const BODY = 0x9aa4c8;
-const BODY_EMISSIVE = 0x2b3050;
-
-function standardMat(color: number, emissive = BODY_EMISSIVE): THREE.MeshStandardMaterial {
+function standardMat(color: number, emissive = SCENE.bodyEmissive): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial({ color, emissive, roughness: 0.65, metalness: 0.15 });
 }
 
 /** A small neutral human figure (cone body + sphere head). */
 function person(): THREE.Group {
   const g = new THREE.Group();
-  const body = new THREE.Mesh(new THREE.ConeGeometry(2.6, 9, 10), standardMat(BODY));
+  const body = new THREE.Mesh(new THREE.ConeGeometry(2.6, 9, 10), standardMat(SCENE.bodyBase));
   body.position.y = 4.5;
   g.add(body);
-  const head = new THREE.Mesh(new THREE.SphereGeometry(1.8, 10, 8), standardMat(BODY));
+  const head = new THREE.Mesh(new THREE.SphereGeometry(1.8, 10, 8), standardMat(SCENE.bodyBase));
   head.position.y = 10.5;
   g.add(head);
   return g;
@@ -49,10 +47,10 @@ function person(): THREE.Group {
 /** A house: box + pyramid roof. */
 function house(): THREE.Group {
   const g = new THREE.Group();
-  const base = new THREE.Mesh(new THREE.BoxGeometry(22, 12, 18), standardMat(0x3a3f63, 0x191c33));
+  const base = new THREE.Mesh(new THREE.BoxGeometry(22, 12, 18), standardMat(SCENE.structure, SCENE.structureEmissive));
   base.position.y = 6;
   g.add(base);
-  const roof = new THREE.Mesh(new THREE.ConeGeometry(16, 8, 4), standardMat(0x2b2f52, 0x14172b));
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(16, 8, 4), standardMat(SCENE.roof, SCENE.roofEmissive));
   roof.position.y = 16;
   roof.rotation.y = Math.PI / 4;
   g.add(roof);
@@ -62,14 +60,14 @@ function house(): THREE.Group {
 /** A parabolic ground terminal: pedestal + tilted dish. */
 function dish(tiltToward: THREE.Vector3, at: THREE.Vector3): THREE.Group {
   const g = new THREE.Group();
-  const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 2.2, 8, 8), standardMat(0x3a3f63));
+  const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 2.2, 8, 8), standardMat(SCENE.structure));
   pedestal.position.y = 4;
   g.add(pedestal);
   const bowl = new THREE.Mesh(
     new THREE.SphereGeometry(7, 16, 8, 0, Math.PI * 2, 0, Math.PI / 3),
     new THREE.MeshStandardMaterial({
-      color: 0xb9c2e8,
-      emissive: 0x2b3050,
+      color: SCENE.panelBright,
+      emissive: SCENE.bodyEmissive,
       roughness: 0.4,
       side: THREE.DoubleSide,
     }),
@@ -86,7 +84,7 @@ function dish(tiltToward: THREE.Vector3, at: THREE.Vector3): THREE.Group {
 /** NFC pair: terminal box + floating card. */
 function nfcPair(): THREE.Group {
   const g = new THREE.Group();
-  const terminal = new THREE.Mesh(new THREE.BoxGeometry(5, 7, 4), standardMat(0x3a3f63));
+  const terminal = new THREE.Mesh(new THREE.BoxGeometry(5, 7, 4), standardMat(SCENE.structure));
   terminal.position.y = 3.5;
   g.add(terminal);
   const card = new THREE.Mesh(new THREE.BoxGeometry(5.5, 3.4, 0.4), standardMat(0x06b6d4, 0x044a56));
@@ -99,7 +97,7 @@ function nfcPair(): THREE.Group {
 /** Low-poly city blocks under the cellular towers. */
 function cityBlocks(rng: () => number): THREE.Group {
   const g = new THREE.Group();
-  const mat = standardMat(0x232746, 0x0e1020);
+  const mat = standardMat(SCENE.groundPlate, SCENE.groundPlateEmissive);
   for (let i = 0; i < 26; i++) {
     const w = 10 + rng() * 14;
     const h = 12 + rng() * 42;
@@ -142,10 +140,10 @@ export class Props {
     add(person(), RECEIVERS['cellular-5g'].pos);
     // 6G backhaul node: a small kiosk box with an antenna stub.
     const kiosk = new THREE.Group();
-    const kbox = new THREE.Mesh(new THREE.BoxGeometry(8, 10, 8), standardMat(0x3a3f63));
+    const kbox = new THREE.Mesh(new THREE.BoxGeometry(8, 10, 8), standardMat(SCENE.structure));
     kbox.position.y = 5;
     kiosk.add(kbox);
-    const stub = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 8, 6), standardMat(BODY));
+    const stub = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 8, 6), standardMat(SCENE.bodyBase));
     stub.position.y = 14;
     kiosk.add(stub);
     add(kiosk, RECEIVERS['6g-subthz'].pos);
@@ -153,12 +151,12 @@ export class Props {
     add(dish(emitterPos('satcom-military'), RECEIVERS['satcom-military'].pos), RECEIVERS['satcom-military'].pos);
     // LEO user terminal: a flat panel tilted at the sky, no dish.
     const flatPanel = new THREE.Group();
-    const fpPost = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.2, 6, 8), standardMat(0x3a3f63));
+    const fpPost = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.2, 6, 8), standardMat(SCENE.structure));
     fpPost.position.y = 3;
     flatPanel.add(fpPost);
     const fpPanel = new THREE.Mesh(
       new THREE.BoxGeometry(10, 0.8, 7),
-      new THREE.MeshStandardMaterial({ color: 0xd8dcf0, emissive: 0x2b3050, roughness: 0.35 }),
+      new THREE.MeshStandardMaterial({ color: SCENE.panelBright, emissive: SCENE.bodyEmissive, roughness: 0.35 }),
     );
     fpPanel.position.y = 7;
     fpPanel.rotation.x = -0.5; // tilted toward the passing satellites
@@ -190,8 +188,8 @@ export class Props {
           new THREE.MeshBasicMaterial({
             color: linkColor,
             transparent: true,
-            opacity: 0.85,
-            blending: THREE.AdditiveBlending,
+            opacity: signalAlpha(0.85),
+            blending: SCENE.blending,
             depthWrite: false,
           }),
         );

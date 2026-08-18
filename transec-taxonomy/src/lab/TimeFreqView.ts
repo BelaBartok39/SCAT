@@ -8,6 +8,8 @@
  * that resets its buffer (length shrinks) triggers a full repaint.
  */
 
+import { getTheme, subscribeTheme } from '../theme';
+import type { ThemeId } from '../theme';
 import { THEME } from './contracts';
 import type { LabView, TimeFreqInput } from './contracts';
 
@@ -16,19 +18,47 @@ const DPR_CAP = 2;
 const ROW_H = 2;
 const MONO = '"JetBrains Mono", ui-monospace, monospace';
 
-/** Colour ramp, dark -> bright, sampled into a 256-entry LUT once. */
-const RAMP: ReadonlyArray<readonly [number, string]> = [
-  [0, '#0a0a16'],
-  [0.34, '#1d2a6e'],
-  [0.72, '#06b6d4'],
-  [1, '#e0f6ff'],
-];
+/**
+ * Colour ramps, sampled into a 256-entry LUT.
+ *
+ * The dark ramp runs dark -> bright: power reads as light emitted. The
+ * light ramp cannot simply invert, because "bright" on white is
+ * invisible; it runs pale -> saturated -> near-black, so power reads as
+ * ink laid down. Both keep the same cyan waypoint so a reader who
+ * switches themes still recognises the mid-range.
+ */
+const RAMPS: Record<ThemeId, ReadonlyArray<readonly [number, string]>> = {
+  dark: [
+    [0, '#0a0a16'],
+    [0.34, '#1d2a6e'],
+    [0.72, '#06b6d4'],
+    [1, '#e0f6ff'],
+  ],
+  light: [
+    [0, '#f4f5f8'],
+    [0.34, '#a9c6d8'],
+    [0.72, '#0e7490'],
+    [1, '#0b2b3a'],
+  ],
+};
 
-const LUT = buildLut();
+let lutTheme: ThemeId | null = null;
+let LUT: Uint8Array = new Uint8Array(256 * 3);
+/** '10, 10, 22' from THEME.bg, so the fade matches the panel background. */
+let BG_RGB = '10, 10, 22';
 
-function buildLut(): Uint8Array {
+/** Rebuild the LUT and background triplet if the theme moved. */
+function ensurePalette(): void {
+  const t = getTheme();
+  if (t === lutTheme) return;
+  lutTheme = t;
+  LUT = buildLut(RAMPS[t]);
+  BG_RGB = bgTriplet(THEME.bg);
+}
+
+function buildLut(ramp: ReadonlyArray<readonly [number, string]>): Uint8Array {
   const lut = new Uint8Array(256 * 3);
-  const stops = RAMP.map(([pos, hex]) => {
+  const stops = ramp.map(([pos, hex]) => {
     const n = parseInt(hex.slice(1), 16);
     return { pos, r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
   });
@@ -47,16 +77,19 @@ function buildLut(): Uint8Array {
   return lut;
 }
 
-/** '10, 10, 22' from THEME.bg, so the fade matches the panel background. */
-const BG_RGB = ((): string => {
-  const m = /rgba?\(([^)]+)\)/.exec(THEME.bg);
-  if (!m) return '10, 10, 22';
-  return m[1]!
-    .split(',')
-    .slice(0, 3)
-    .map((s) => s.trim())
-    .join(', ');
-})();
+/** THEME.bg is 'rgba(...)' on dark and a hex on light; accept either. */
+function bgTriplet(bg: string): string {
+  const m = /rgba?\(([^)]+)\)/.exec(bg);
+  if (m) {
+    return m[1]!.split(',').slice(0, 3).map((x) => x.trim()).join(', ');
+  }
+  const h = /^#([0-9a-f]{6})$/i.exec(bg.trim());
+  if (h) {
+    const n = parseInt(h[1]!, 16);
+    return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
+  }
+  return '10, 10, 22';
+}
 
 function hexToRgba(hex: string, alpha: number): string {
   const n = parseInt(hex.slice(1), 16);
@@ -79,6 +112,7 @@ export class TimeFreqView implements LabView<TimeFreqInput> {
   /** How many rows of the caller's array are already painted offscreen. */
   private painted = 0;
   private last: TimeFreqInput | null = null;
+  private unsubTheme: () => void;
 
   constructor(private container: HTMLElement) {
     this.canvas = document.createElement('canvas');
@@ -98,10 +132,22 @@ export class TimeFreqView implements LabView<TimeFreqInput> {
 
     this.ro = new ResizeObserver(() => this.resize());
     this.ro.observe(container);
+
+    // A theme switch invalidates every already-painted row, so drop the
+    // history and rebuild it from the caller's buffer.
+    this.unsubTheme = subscribeTheme(() => {
+      this.painted = 0;
+      if (this.last) {
+        this.paintRows(this.last);
+        this.compose(this.last);
+      }
+    });
+
     this.resize();
   }
 
   render(input: TimeFreqInput): void {
+    ensurePalette();
     this.last = input;
     this.resize();
     this.paintRows(input);
@@ -109,6 +155,7 @@ export class TimeFreqView implements LabView<TimeFreqInput> {
   }
 
   destroy(): void {
+    this.unsubTheme();
     this.ro.disconnect();
     this.canvas.remove();
     this.off.width = 0;

@@ -46,7 +46,7 @@
 }
 .matrix-table thead th[data-obj]:hover { color: var(--text-primary); border-color: var(--border-accent); }
 .matrix-table thead th[data-obj].lens-active {
-  color: #fff;
+  color: var(--on-accent);
   background: var(--obj-color);
   border-color: var(--obj-color);
 }
@@ -79,7 +79,7 @@
   padding: 1px 7px;
   border-radius: 4px;
   margin-bottom: 4px;
-  color: #fff;
+  color: var(--on-accent);
 }
 .matrix-cell .m-note { display: block; color: var(--text-secondary); }
 
@@ -92,7 +92,7 @@
 .matrix-cell.mat-N .m-badge { background: var(--maturity-n); }
 .matrix-cell.mat-E .m-badge { background: var(--maturity-e); }
 .matrix-cell.mat-R .m-badge { background: var(--maturity-r); }
-.matrix-cell.mat-W .m-badge { background: #4b5563; }
+.matrix-cell.mat-W .m-badge { background: var(--maturity-w-badge); }
 
 /* Lens dimming: when a lens is active, other columns recede */
 .matrix-table.lens-on .matrix-cell:not(.in-lens) { opacity: 0.28; }
@@ -154,7 +154,7 @@
   border: 1px solid var(--border-subtle);
   border-left: 3px solid var(--accent-indigo);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  background: rgba(15, 15, 30, 0.55);
+  background: var(--bg-sunken);
   font-size: 13px;
   line-height: 1.68;
   color: var(--text-secondary);

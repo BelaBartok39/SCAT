@@ -14,6 +14,7 @@
  */
 
 import * as THREE from 'three';
+import { SCENE, signalAlpha } from './palette';
 import { Channel } from '../dsp/channel';
 import type { BandId } from '../data/types';
 import { BAND_ORDER } from '../data/types';
@@ -387,8 +388,8 @@ export class Warden {
       const mat = new THREE.LineBasicMaterial({
         color: SIGHT_COLOR[o.verdict],
         transparent: true,
-        opacity: o.bandId === this.hoveredBand ? 0.95 : 0.4,
-        blending: THREE.AdditiveBlending,
+        opacity: signalAlpha(o.bandId === this.hoveredBand ? 0.95 : 0.4),
+        blending: SCENE.blending,
         depthWrite: false,
       });
       const line = new THREE.Line(geo, mat);

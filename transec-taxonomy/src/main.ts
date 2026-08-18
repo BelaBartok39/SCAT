@@ -15,6 +15,9 @@ import './styles/warden.css';
 import './styles/about.css';
 
 import { subscribeKeys, getState } from './store';
+import { apply as applyTheme, getTheme, subscribeTheme } from './theme';
+import { applyLabTheme } from './lab/contracts';
+import { applyScenePalette } from './scene/palette';
 import { initRouter } from './router';
 import { mountChrome } from './views/chrome';
 import { mountMatrix } from './views/matrix';
@@ -22,6 +25,13 @@ import { mountModal } from './views/modal';
 import { mountScene } from './views/scene';
 import { mountLab } from './views/lab';
 import { mountAbout } from './views/about';
+
+// Before anything mounts, so the first paint is already in the right theme.
+applyTheme();
+applyLabTheme(getTheme());
+applyScenePalette(getTheme());
+// Palettes first, so the scene rebuild that follows reads the new values.
+subscribeTheme((t) => { applyLabTheme(t); applyScenePalette(t); });
 
 const app = document.getElementById('app')!;
 

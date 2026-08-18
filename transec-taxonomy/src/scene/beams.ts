@@ -9,6 +9,7 @@
  */
 
 import * as THREE from 'three';
+import { SCENE, signalAlpha } from './palette';
 import type { BandId } from '../data/types';
 import type { EmitterHandle } from './emitters';
 import { RECEIVERS } from './props';
@@ -38,8 +39,8 @@ export class ServingBeams {
         color,
         map: getBeamTexture(),
         transparent: true,
-        opacity: 0.34,
-        blending: THREE.AdditiveBlending,
+        opacity: signalAlpha(0.34),
+        blending: SCENE.blending,
         depthWrite: false,
         side: THREE.DoubleSide,
       });
@@ -56,8 +57,8 @@ export class ServingBeams {
         new THREE.MeshBasicMaterial({
           color,
           transparent: true,
-          opacity: 0.3,
-          blending: THREE.AdditiveBlending,
+          opacity: signalAlpha(0.3),
+          blending: SCENE.blending,
           depthWrite: false,
           side: THREE.DoubleSide,
         }),

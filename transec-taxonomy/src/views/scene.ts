@@ -8,6 +8,7 @@ import { SceneRoot } from '../scene/SceneRoot';
 import { BANDS } from '../data/bands';
 import type { BandId } from '../data/types';
 import { getState, setState, subscribeKeys } from '../store';
+import { subscribeTheme } from '../theme';
 import { mountRibbon } from './ribbon';
 
 let root: SceneRoot | null = null;
@@ -54,5 +55,21 @@ export function mountScene(container: HTMLElement): void {
     }
   };
   subscribeKeys(['view'], init);
+
+  // Three.js materials capture their colour at construction, so the theme
+  // cannot be repainted onto a live scene — it is torn down and rebuilt.
+  // Rebuilding is only safe once WebGL has proved it works, hence the
+  // `failed` guard: a fallback notice must not be replaced by a second
+  // doomed attempt.
+  subscribeTheme(() => {
+    if (failed) return;
+    if (root) {
+      root.dispose();
+      root = null;
+      container.querySelector('.ribbon')?.remove();
+    }
+    init();
+  });
+
   init();
 }

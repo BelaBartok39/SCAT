@@ -15,23 +15,68 @@
  *    <canvas>, sizes it to the container via ResizeObserver, and scales
  *    for devicePixelRatio (cap 2).
  *  - Colors come from THEME below (matches the app design tokens).
+ *    THEME is mutated in place when the user switches theme; read it
+ *    at draw time, never cache its fields in a constructor.
  *  - Text: 10–11px "JetBrains Mono", labels uppercase, sparse.
  *  - destroy() removes the canvas and observers.
  */
 
-export const THEME = {
+export interface LabTheme {
+  bg: string;
+  grid: string;
+  axis: string;
+  text: string;
+  textBright: string;
+  trace: string;       // primary signal trace
+  trace2: string;      // secondary trace (Q component, comparison)
+  ideal: string;       // ideal constellation points
+  good: string;        // legitimate receiver / pass
+  bad: string;         // eavesdropper / jammer / fail
+  warn: string;
+}
+
+const DARK: LabTheme = {
   bg: 'rgba(10, 10, 22, 0.92)',
   grid: 'rgba(99, 102, 241, 0.14)',
   axis: 'rgba(156, 163, 175, 0.5)',
   text: '#9ca3af',
   textBright: '#e0e0f0',
-  trace: '#06b6d4',      // primary signal trace
-  trace2: '#818cf8',     // secondary trace (Q component, comparison)
-  ideal: '#6b7280',      // ideal constellation points
-  good: '#10b981',       // legitimate receiver / pass
-  bad: '#f43f5e',        // eavesdropper / jammer / fail
+  trace: '#06b6d4',
+  trace2: '#818cf8',
+  ideal: '#6b7280',
+  good: '#10b981',
+  bad: '#f43f5e',
   warn: '#f59e0b',
-} as const;
+};
+
+/* Light is not an inversion. Traces darken so they carry against white,
+   the grid drops to a neutral grey hairline rather than a tinted one,
+   and `ideal` lightens because it sits *behind* the measured points in
+   both themes and must stay the quieter of the two. */
+const LIGHT: LabTheme = {
+  bg: '#ffffff',
+  grid: 'rgba(20, 26, 48, 0.10)',
+  axis: 'rgba(20, 26, 48, 0.45)',
+  text: '#6b7383',
+  textBright: '#12141c',
+  trace: '#0e7490',
+  trace2: '#5b3fa8',
+  ideal: '#a8b0c0',
+  good: '#047857',
+  bad: '#be123c',
+  warn: '#b45309',
+};
+
+/**
+ * Live palette. Mutated in place on theme change so the ~58 existing
+ * `THEME.x` reads across the lab views keep working untouched; the RAF
+ * loop picks up new values on its next frame.
+ */
+export const THEME: LabTheme = { ...DARK };
+
+export function applyLabTheme(theme: 'dark' | 'light'): void {
+  Object.assign(THEME, theme === 'light' ? LIGHT : DARK);
+}
 
 export interface LabView<TInput> {
   /** Draw one frame. Must be safe to call at any cadence, including once. */

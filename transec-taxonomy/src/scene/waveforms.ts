@@ -9,6 +9,7 @@
  */
 
 import * as THREE from 'three';
+import { SCENE, signalAlpha } from './palette';
 import type { Mechanism } from '../data/types';
 
 export type WaveformKind = Mechanism['sceneVisual'];
@@ -50,9 +51,9 @@ export function getBeamTexture(): THREE.Texture {
   cv.height = 64;
   const ctx = cv.getContext('2d')!;
   const g = ctx.createLinearGradient(0, 0, 0, 64);
-  g.addColorStop(0, 'rgba(255,255,255,0.85)');
-  g.addColorStop(0.6, 'rgba(255,255,255,0.25)');
-  g.addColorStop(1, 'rgba(255,255,255,0)');
+  g.addColorStop(0, `rgba(${SCENE.glowRgb},0.85)`);
+  g.addColorStop(0.6, `rgba(${SCENE.glowRgb},0.25)`);
+  g.addColorStop(1, `rgba(${SCENE.glowRgb},0)`);
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, 1, 64);
   beamTex = new THREE.CanvasTexture(cv);
@@ -64,9 +65,9 @@ function additiveMat(color: THREE.Color, opacity: number, map?: THREE.Texture): 
   return new THREE.MeshBasicMaterial({
     color,
     transparent: true,
-    opacity,
+    opacity: signalAlpha(opacity),
     map,
-    blending: THREE.AdditiveBlending,
+    blending: SCENE.blending,
     depthWrite: false,
     side: THREE.DoubleSide,
   });
@@ -179,8 +180,8 @@ class SpreadHaze extends BaseWaveform {
       color,
       size: 1.7,
       transparent: true,
-      opacity: 0.5,
-      blending: THREE.AdditiveBlending,
+      opacity: signalAlpha(0.5),
+      blending: SCENE.blending,
       depthWrite: false,
     });
     this.track(mat);
@@ -284,7 +285,7 @@ class NulledLobe extends BaseWaveform {
     const fill = new THREE.Mesh(
       ng,
       new THREE.MeshBasicMaterial({
-        color: 0x07070f,
+        color: SCENE.fog,
         transparent: true,
         opacity: 0.5,
         depthWrite: false,
@@ -342,8 +343,8 @@ class AbsorptionFalloff extends BaseWaveform {
       color: 0xf59e0b,
       size: 1.1,
       transparent: true,
-      opacity: 0.4,
-      blending: THREE.AdditiveBlending,
+      opacity: signalAlpha(0.4),
+      blending: SCENE.blending,
       depthWrite: false,
     });
     this.track(pm);

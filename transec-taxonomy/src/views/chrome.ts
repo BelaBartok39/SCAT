@@ -5,6 +5,7 @@
  */
 
 import { getState, setState, subscribeKeys } from '../store';
+import { getTheme, toggleTheme, subscribeTheme } from '../theme';
 import type { ViewId } from '../store';
 import type { ObjectiveId } from '../data/types';
 import { OBJECTIVE_ORDER } from '../data/types';
@@ -42,8 +43,38 @@ export function mountChrome(root: HTMLElement): void {
         return `<button class="lens-btn" data-lens="${id}" style="--obj-color:${m.color}" title="${m.title}" aria-pressed="false">${m.abbr}</button>`;
       }).join('')}
     </div>
+    <button class="theme-toggle" type="button" aria-live="polite">
+      <span class="tt-icon" aria-hidden="true"></span>
+      <span class="tt-label"></span>
+    </button>
   `;
   root.appendChild(header);
+
+  const SUN = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" '
+    + 'stroke="currentColor" stroke-width="2" stroke-linecap="round">'
+    + '<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4'
+    + 'M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7'
+    + 'M6.6 17.4l-1.7 1.7"/></svg>';
+  const MOON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" '
+    + 'stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+    + 'stroke-linejoin="round"><path d="M20 14.2A8.2 8.2 0 1 1 9.8 4'
+    + 'a6.4 6.4 0 0 0 10.2 10.2z"/></svg>';
+
+  const themeBtn = header.querySelector<HTMLButtonElement>('.theme-toggle')!;
+  const themeIcon = themeBtn.querySelector<HTMLElement>('.tt-icon')!;
+  const themeLabel = themeBtn.querySelector<HTMLElement>('.tt-label')!;
+  themeBtn.addEventListener('click', toggleTheme);
+
+  const syncTheme = () => {
+    // The control is labelled with what it will DO, not what is active.
+    const next = getTheme() === 'dark' ? 'light' : 'dark';
+    themeIcon.innerHTML = next === 'light' ? SUN : MOON;
+    themeLabel.textContent = next === 'light' ? 'Light' : 'Dark';
+    themeBtn.title = `Switch to ${next} theme`;
+    themeBtn.setAttribute('aria-label', `Switch to ${next} theme`);
+  };
+  subscribeTheme(syncTheme);
+  syncTheme();
 
   header.querySelectorAll<HTMLButtonElement>('.view-btn').forEach((btn) => {
     btn.addEventListener('click', () => setState({ view: btn.dataset.view as ViewId }));

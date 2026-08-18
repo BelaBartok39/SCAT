@@ -37,7 +37,7 @@
 /* Callout */
 .ab-note {
   border-left: 3px solid var(--accent-cyan);
-  background: rgba(6, 182, 212, 0.06);
+  background: color-mix(in srgb, var(--accent-cyan) 7%, transparent);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   padding: 10px 14px;
   font-size: 13.5px;
@@ -52,7 +52,7 @@
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
-  color: #fff;
+  color: var(--on-accent);
   border-radius: 4px;
   padding: 2px 8px;
 }
@@ -78,7 +78,7 @@
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
-  color: #fff;
+  color: var(--on-accent);
   border-radius: 4px;
   padding: 1px 8px;
   flex-shrink: 0;
@@ -89,8 +89,8 @@
 .ab-mat.mat-E .ab-mat-badge { background: var(--maturity-e); }
 .ab-mat.mat-R { border-color: var(--maturity-r); }
 .ab-mat.mat-R .ab-mat-badge { background: var(--maturity-r); }
-.ab-mat.mat-W { border-color: rgba(107, 114, 128, 0.4); }
-.ab-mat.mat-W .ab-mat-badge { background: #4b5563; }
+.ab-mat.mat-W { border-color: var(--maturity-w-bg); }
+.ab-mat.mat-W .ab-mat-badge { background: var(--maturity-w-badge); }
 .ab-count { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-label); margin-top: 2px; }
 
 /* Warden verdict key */
@@ -99,7 +99,7 @@
   font-size: 12.5px;
   padding: 7px 12px;
   border-radius: var(--radius-sm);
-  background: rgba(15, 15, 30, 0.6);
+  background: var(--bg-sunken);
 }
 .ab-v span {
   font-family: var(--font-mono);
@@ -135,13 +135,13 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   background: linear-gradient(90deg,
-    rgba(99, 102, 241, 0.16) 0%,
-    rgba(99, 102, 241, 0.13) 55%,
-    rgba(245, 158, 11, 0.14) 62%,
-    rgba(6, 182, 212, 0.15) 72%,
-    rgba(6, 182, 212, 0.18) 100%);
+    color-mix(in srgb, var(--accent-indigo) 18%, transparent) 0%,
+    color-mix(in srgb, var(--accent-indigo) 15%, transparent) 55%,
+    color-mix(in srgb, var(--accent-amber) 16%, transparent) 62%,
+    color-mix(in srgb, var(--accent-cyan) 17%, transparent) 72%,
+    color-mix(in srgb, var(--accent-cyan) 20%, transparent) 100%);
 }
-.ab-regime-demo .r-signal { color: #818cf8; }
+.ab-regime-demo .r-signal { color: var(--accent-violet); }
 .ab-regime-demo .r-transition { color: var(--accent-amber); }
 .ab-regime-demo .r-spatial { color: var(--accent-cyan); }
 

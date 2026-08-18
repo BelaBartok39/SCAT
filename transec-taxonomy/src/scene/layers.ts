@@ -5,6 +5,7 @@
  */
 
 import * as THREE from 'three';
+import { SCENE, radialTexture } from './palette';
 
 // Compressed vertical stack: real orbits are unrenderable anyway, and a
 // tighter diorama keeps ground props and satellites in one readable frame.
@@ -29,14 +30,14 @@ function makeLayerCaption(text: string): THREE.Sprite {
   canvas.height = h * scale;
   const ctx = canvas.getContext('2d')!;
   ctx.scale(scale, scale);
-  ctx.fillStyle = 'rgba(12, 12, 26, 0.65)';
+  ctx.fillStyle = SCENE.labelBg;
   ctx.beginPath();
   ctx.roundRect(2, 2, w - 4, h - 4, 7);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(139, 163, 255, 0.28)';
+  ctx.strokeStyle = SCENE.labelBorder;
   ctx.lineWidth = 1;
   ctx.stroke();
-  ctx.fillStyle = '#8fa3ff';
+  ctx.fillStyle = SCENE.labelText;
   ctx.font = '600 12px "JetBrains Mono", monospace';
   ctx.fillText(text, 11, 19);
   const tex = new THREE.CanvasTexture(canvas);
@@ -51,18 +52,7 @@ function makeLayerCaption(text: string): THREE.Sprite {
 
 /** Soft round dot texture so LEO points read as lights, not squares. */
 function makeDotTexture(): THREE.Texture {
-  const cv = document.createElement('canvas');
-  cv.width = cv.height = 32;
-  const ctx = cv.getContext('2d')!;
-  const g = ctx.createRadialGradient(16, 16, 1, 16, 16, 16);
-  g.addColorStop(0, 'rgba(255,255,255,1)');
-  g.addColorStop(0.4, 'rgba(255,255,255,0.55)');
-  g.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, 32, 32);
-  const tex = new THREE.CanvasTexture(cv);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
+  return radialTexture(32, [[0, 1], [0.4, 0.55], [1, 0]]);
 }
 
 export interface LayerHandles {
@@ -76,23 +66,27 @@ export function buildLayers(scene: THREE.Scene): LayerHandles {
   // — Ground disc —
   const ground = new THREE.Mesh(
     new THREE.CircleGeometry(620, 96),
-    new THREE.MeshBasicMaterial({ color: 0x0b0d1c, transparent: true, opacity: 0.85 }),
+    new THREE.MeshBasicMaterial({
+      color: SCENE.ground,
+      transparent: true,
+      opacity: SCENE.groundOpacity,
+    }),
   );
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -0.5;
   scene.add(ground);
 
-  const grid = new THREE.PolarGridHelper(620, 12, 8, 64, 0x2a2c4a, 0x181a30);
+  const grid = new THREE.PolarGridHelper(620, 12, 8, 64, SCENE.gridMajor, SCENE.gridMinor);
   grid.position.y = 0;
   (grid.material as THREE.Material).transparent = true;
-  (grid.material as THREE.Material).opacity = 0.5;
+  (grid.material as THREE.Material).opacity = SCENE.gridOpacity;
   scene.add(grid);
 
   // — Atmosphere haze rings (subtle horizontal bands at layer heights) —
   for (const [h, color, opacity] of [
-    [LAYER_HEIGHTS.leo, 0x2632aa, 0.05],
-    [LAYER_HEIGHTS.geo, 0x4c2a7a, 0.045],
-  ] as const) {
+    [LAYER_HEIGHTS.leo, SCENE.hazeLeo, 0.05 * SCENE.hazeOpacity],
+    [LAYER_HEIGHTS.geo, SCENE.hazeGeo, 0.045 * SCENE.hazeOpacity],
+  ] as [number, number, number][]) {
     const band = new THREE.Mesh(
       new THREE.RingGeometry(400, 640, 64),
       new THREE.MeshBasicMaterial({
@@ -123,7 +117,7 @@ export function buildLayers(scene: THREE.Scene): LayerHandles {
   const leoDots = new THREE.Points(
     leoGeo,
     new THREE.PointsMaterial({
-      color: 0x8fa3ff,
+      color: SCENE.leoDot,
       size: 4.2,
       sizeAttenuation: true,
       transparent: true,
@@ -138,7 +132,11 @@ export function buildLayers(scene: THREE.Scene): LayerHandles {
   // — A faint ring at LEO height so the shell reads as a layer, not stray dots —
   const leoRing = new THREE.Mesh(
     new THREE.TorusGeometry(410, 0.6, 8, 128),
-    new THREE.MeshBasicMaterial({ color: 0x8fa3ff, transparent: true, opacity: 0.22 }),
+    new THREE.MeshBasicMaterial({
+      color: SCENE.leoRing,
+      transparent: true,
+      opacity: SCENE.leoRingOpacity,
+    }),
   );
   leoRing.rotation.x = Math.PI / 2;
   leoRing.position.y = LAYER_HEIGHTS.leo;
@@ -149,12 +147,16 @@ export function buildLayers(scene: THREE.Scene): LayerHandles {
   const gnss = new THREE.Group();
   const meoRing = new THREE.Mesh(
     new THREE.TorusGeometry(400, 0.5, 8, 128),
-    new THREE.MeshBasicMaterial({ color: 0xb9a8ff, transparent: true, opacity: 0.16 }),
+    new THREE.MeshBasicMaterial({
+      color: SCENE.meoRing,
+      transparent: true,
+      opacity: SCENE.meoRingOpacity,
+    }),
   );
   meoRing.rotation.x = Math.PI / 2;
   gnss.add(meoRing);
   const gnssDotMat = new THREE.PointsMaterial({
-    color: 0xcbbcff,
+    color: SCENE.gnssDot,
     size: 5.2,
     sizeAttenuation: true,
     transparent: true,
@@ -179,7 +181,11 @@ export function buildLayers(scene: THREE.Scene): LayerHandles {
   // — GEO arc: a thin ring far overhead —
   const geoRing = new THREE.Mesh(
     new THREE.TorusGeometry(390, 0.9, 8, 128),
-    new THREE.MeshBasicMaterial({ color: 0x6b5aa8, transparent: true, opacity: 0.5 }),
+    new THREE.MeshBasicMaterial({
+      color: SCENE.geoRing,
+      transparent: true,
+      opacity: SCENE.geoRingOpacity,
+    }),
   );
   geoRing.rotation.x = Math.PI / 2;
   geoRing.position.y = LAYER_HEIGHTS.geo;
@@ -199,8 +205,8 @@ export function buildLayers(scene: THREE.Scene): LayerHandles {
   scene.add(leoCap);
 
   // — Soft key light + ambient so emitter materials read —
-  scene.add(new THREE.AmbientLight(0x8888aa, 0.9));
-  const key = new THREE.DirectionalLight(0xaabbff, 1.1);
+  scene.add(new THREE.AmbientLight(SCENE.ambient, SCENE.ambientIntensity));
+  const key = new THREE.DirectionalLight(SCENE.key, SCENE.keyIntensity);
   key.position.set(200, 400, 150);
   scene.add(key);
 

@@ -7,6 +7,10 @@
 }
 
 .scene-canvas {
+  border-radius: var(--radius-lg);
+}
+
+.scene-canvas {
   position: absolute;
   inset: 0;
   width: 100%;

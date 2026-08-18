@@ -69,19 +69,19 @@
   font-size: 11px;
   color: var(--accent-cyan);
   background: transparent;
-  border: 1px solid rgba(6, 182, 212, 0.35);
+  border: 1px solid var(--border-accent);
   border-radius: var(--radius-sm);
   padding: 5px 10px;
   cursor: pointer;
   transition: all var(--transition-fast);
 }
-.signal-scheme-head .s-open:hover { background: rgba(6, 182, 212, 0.12); }
+.signal-scheme-head .s-open:hover { background: color-mix(in srgb, var(--accent-cyan) 14%, transparent); }
 
 /* Full-screen overlay */
 .lab-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(4, 4, 10, 0.8);
+  background: var(--bg-plot);
   backdrop-filter: blur(8px);
   z-index: 60;
   display: flex;
@@ -99,7 +99,7 @@
   max-height: calc(100dvh - 40px);
   display: flex;
   flex-direction: column;
-  background: rgba(10, 10, 22, 0.98);
+  background: var(--bg-panel);
   border: 1px solid var(--border-accent);
   border-radius: var(--radius-xl);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7), var(--shadow-glow);

@@ -9,6 +9,7 @@
  */
 
 import * as THREE from 'three';
+import { SCENE } from './palette';
 import { CELLS } from '../data/matrix';
 import { MECHANISMS } from '../data/mechanisms';
 import type { Maturity, MechanismId, ObjectiveId } from '../data/types';
@@ -34,7 +35,7 @@ const MATURITY_INTENSITY: Record<Maturity, number> = {
   W: 0.1,
 };
 
-const BASE_COLOR = new THREE.Color(0x6366f1);
+const baseColor = (): THREE.Color => new THREE.Color(SCENE.emitterBase);
 const FADE_SPEED = 2.6; // 1/s — cross-fade rate
 
 interface Slot {
@@ -82,9 +83,9 @@ export class Lens {
 
       if (!lens) {
         // Neutral view: base indigo, ambient broadcast rings on every band.
-        handle.setTint(BASE_COLOR, 0.5);
+        handle.setTint(baseColor(), 0.5);
         handle.setDimmed(false);
-        slot.active = createWaveform('omniRings', BASE_COLOR.clone().multiplyScalar(0.8));
+        slot.active = createWaveform('omniRings', baseColor().multiplyScalar(0.8));
         slot.targetFade = 0.22; // subtle ambience — props and links carry the story now
         slot.fade = 0;
         handle.group.add(slot.active.group);

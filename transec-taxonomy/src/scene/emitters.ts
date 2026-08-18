@@ -5,6 +5,7 @@
  */
 
 import * as THREE from 'three';
+import { SCENE, radialTexture } from './palette';
 import { BANDS } from '../data/bands';
 import type { Band, BandId } from '../data/types';
 import { LAYER_HEIGHTS } from './layers';
@@ -34,7 +35,8 @@ const POSITIONS: Record<BandId, [number, number, number]> = {
   'satcom-military': [150, LAYER_HEIGHTS.geo, -120],
 };
 
-const BASE_COLOR = new THREE.Color(0x6366f1);
+/** Read at build time, not module load, so a rebuild picks up the theme. */
+const baseColor = (): THREE.Color => new THREE.Color(SCENE.emitterBase);
 
 function makeLabelSprite(text: string, sub: string): THREE.Sprite {
   const canvas = document.createElement('canvas');
@@ -52,15 +54,15 @@ function makeLabelSprite(text: string, sub: string): THREE.Sprite {
   const ctx = canvas.getContext('2d')!;
   ctx.scale(scale, scale);
 
-  ctx.fillStyle = 'rgba(12, 12, 26, 0.78)';
+  ctx.fillStyle = SCENE.labelBg;
   ctx.beginPath();
   ctx.roundRect(4, 4, w - 8, h - 8, 10);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(99, 102, 241, 0.35)';
+  ctx.strokeStyle = SCENE.labelBorder;
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  ctx.fillStyle = '#e0e0f0';
+  ctx.fillStyle = SCENE.labelText;
   ctx.font = '700 17px Inter, sans-serif';
   ctx.fillText(text, 14, 28);
   ctx.fillStyle = '#06b6d4';
@@ -80,23 +82,14 @@ function makeLabelSprite(text: string, sub: string): THREE.Sprite {
 }
 
 function makeGlowSprite(): THREE.Sprite {
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 128;
-  const ctx = canvas.getContext('2d')!;
-  const g = ctx.createRadialGradient(64, 64, 4, 64, 64, 64);
-  g.addColorStop(0, 'rgba(255,255,255,0.9)');
-  g.addColorStop(0.35, 'rgba(255,255,255,0.28)');
-  g.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, 128, 128);
-  const tex = new THREE.CanvasTexture(canvas);
+  const tex = radialTexture(128, [[0, 0.9], [0.35, 0.28], [1, 0]]);
   const sprite = new THREE.Sprite(
     new THREE.SpriteMaterial({
       map: tex,
       transparent: true,
       depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      color: BASE_COLOR,
+      blending: SCENE.blending,
+      color: baseColor(),
     }),
   );
   sprite.scale.set(30, 30, 1);
@@ -119,8 +112,8 @@ export function buildEmitters(scene: THREE.Scene): EmitterHandle[] {
       ? new THREE.BoxGeometry(11, 11, 11)
       : new THREE.IcosahedronGeometry(8, 1);
     const coreMat = new THREE.MeshStandardMaterial({
-      color: BASE_COLOR.clone(),
-      emissive: BASE_COLOR.clone(),
+      color: baseColor(),
+      emissive: baseColor(),
       emissiveIntensity: 0.5,
       roughness: 0.4,
       metalness: 0.3,
@@ -132,8 +125,8 @@ export function buildEmitters(scene: THREE.Scene): EmitterHandle[] {
     if (isOrbital) {
       // Solar panels
       const panelMat = new THREE.MeshStandardMaterial({
-        color: 0x2438a0,
-        emissive: 0x16205a,
+        color: SCENE.emitterShell,
+        emissive: SCENE.emitterShellEmissive,
         roughness: 0.6,
       });
       for (const side of [-1, 1]) {
@@ -145,7 +138,11 @@ export function buildEmitters(scene: THREE.Scene): EmitterHandle[] {
       // Terrestrial mast down to the ground
       const mast = new THREE.Mesh(
         new THREE.CylinderGeometry(0.5, 0.9, y, 6),
-        new THREE.MeshBasicMaterial({ color: 0x30324e, transparent: true, opacity: 0.8 }),
+        new THREE.MeshBasicMaterial({
+          color: SCENE.emitterCollar,
+          transparent: true,
+          opacity: 0.8,
+        }),
       );
       mast.position.y = -y / 2;
       group.add(mast);

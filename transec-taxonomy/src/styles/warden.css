@@ -10,8 +10,8 @@
   display: flex;
   flex-direction: column;
   z-index: 10;
-  background: rgba(10, 10, 22, 0.88);
-  border: 1px solid rgba(244, 63, 94, 0.28);
+  background: var(--bg-panel-soft);
+  border: 1px solid rgba(var(--warden-tint), 0.28);
   border-radius: var(--radius-md);
   backdrop-filter: blur(10px);
   font-family: var(--font-mono);
@@ -29,7 +29,7 @@
   cursor: pointer;
   text-align: left;
 }
-.wp-head:hover { background: rgba(244, 63, 94, 0.07); }
+.wp-head:hover { background: rgba(var(--warden-tint), 0.07); }
 .wp-head:focus-visible { outline: 2px solid var(--accent-pink); outline-offset: -2px; }
 .wp-title {
   font-family: var(--font-mono);
@@ -62,7 +62,7 @@
   font-family: var(--font-mono);
   font-size: 9.5px;
   color: var(--text-secondary);
-  background: rgba(15, 15, 30, 0.7);
+  background: var(--bg-sunken);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   padding: 6px 4px;
@@ -83,7 +83,7 @@
   overflow-y: auto;
   min-height: 0;
   scrollbar-width: thin;
-  scrollbar-color: rgba(244, 63, 94, 0.3) transparent;
+  scrollbar-color: rgba(var(--warden-tint), 0.3) transparent;
 }
 .wp-list li {
   display: grid;
@@ -92,11 +92,11 @@
   font-size: 10px;
   padding: 5px 7px;
   border-radius: 6px;
-  background: rgba(15, 15, 30, 0.6);
+  background: var(--bg-sunken);
   cursor: default;
   transition: background var(--transition-fast);
 }
-.wp-list li:hover { background: rgba(30, 30, 55, 0.85); }
+.wp-list li:hover { background: var(--bg-sunken-hi); }
 .wp-band { font-weight: 700; color: var(--text-primary); white-space: nowrap; }
 .wp-verdict { text-align: right; letter-spacing: 0.06em; }
 .wp-reason {
@@ -112,7 +112,7 @@
 .v-unresolvable .wp-verdict { color: var(--accent-amber); }
 .v-unresolvable { border-left: 2px solid var(--accent-amber); }
 .v-nothing .wp-verdict { color: var(--accent-green); }
-.v-nothing { border-left: 2px solid rgba(16, 185, 129, 0.5); }
+.v-nothing { border-left: 2px solid color-mix(in srgb, var(--accent-green) 55%, transparent); }
 
 .wp-toggles { display: flex; gap: 8px; }
 .wp-toggle {
@@ -129,7 +129,7 @@
 }
 .wp-toggle:hover { color: var(--text-primary); border-color: var(--accent-amber); }
 .wp-toggle.on {
-  color: #1a1206;
+  color: var(--on-amber);
   background: var(--accent-amber);
   border-color: var(--accent-amber);
   font-weight: 700;

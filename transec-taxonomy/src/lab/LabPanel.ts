@@ -6,6 +6,7 @@
  */
 
 import type { ModulationScheme } from '../data/types';
+import { subscribeTheme } from '../theme';
 import type { LabView } from './contracts';
 import { ConstellationView } from './ConstellationView';
 import { TimeDomainView } from './TimeDomainView';
@@ -37,6 +38,7 @@ export class LabPanel {
   private frame = 0;
   private visible = true;
   private destroyed = false;
+  private unsubTheme: (() => void) | null = null;
   private io: IntersectionObserver;
   private root: HTMLElement;
 
@@ -72,6 +74,7 @@ export class LabPanel {
       this.syncLoop();
     });
     this.io.observe(this.root);
+    this.unsubTheme = subscribeTheme(this.onThemeChange);
 
     if (getState().reducedMotion) {
       // Static representative frame; STEP advances manually.
@@ -130,6 +133,12 @@ export class LabPanel {
     }
   }
 
+  /** Repaint once on theme change: under reduced motion the RAF loop is
+      off, so nothing would otherwise redraw with the new palette. */
+  private onThemeChange = (): void => {
+    if (!this.destroyed && this.visible) this.step();
+  };
+
   private syncLoop(): void {
     const want = this.visible && !this.destroyed && !getState().reducedMotion;
     if (want && !this.raf) {
@@ -149,6 +158,7 @@ export class LabPanel {
 
   destroy(): void {
     this.destroyed = true;
+    this.unsubTheme?.();
     if (this.raf) cancelAnimationFrame(this.raf);
     this.io.disconnect();
     for (const v of this.views.values()) v.destroy();

@@ -5,6 +5,7 @@
  */
 
 import * as THREE from 'three';
+import { SCENE } from './palette';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { buildLayers } from './layers';
 import { buildEmitters } from './emitters';
@@ -36,6 +37,8 @@ export class SceneRoot {
   private clock = new THREE.Clock();
   private running = false;
   private animId = 0;
+  /** Everything that has to be undone by dispose(). */
+  private teardown: (() => void)[] = [];
 
   constructor(private container: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -62,7 +65,7 @@ export class SceneRoot {
       this.director.cancel();
     });
 
-    this.scene.fog = new THREE.FogExp2(0x07070f, 0.00062);
+    this.scene.fog = new THREE.FogExp2(SCENE.fog, SCENE.fogDensity);
 
     const { leoDots, leoRing, gnss } = buildLayers(this.scene);
     // LEO drifts fast, GNSS crawls, GEO hangs still — the orbit trade in motion.
@@ -157,16 +160,57 @@ export class SceneRoot {
     // — Resize —
     const ro = new ResizeObserver(() => this.resize());
     ro.observe(container);
+    this.teardown.push(() => ro.disconnect());
     this.resize();
 
     // — Pause when modal open / tab hidden; resume otherwise —
-    subscribeKeys(['selectedBand', 'labScheme', 'view'], () => this.syncRunning());
-    document.addEventListener('visibilitychange', () => this.syncRunning());
-    subscribeKeys(['reducedMotion'], () => {
-      this.controls.autoRotate = !getState().reducedMotion && this.controls.autoRotate;
-    });
+    this.teardown.push(
+      subscribeKeys(['selectedBand', 'labScheme', 'view'], () => this.syncRunning()),
+    );
+    const onVis = () => this.syncRunning();
+    document.addEventListener('visibilitychange', onVis);
+    this.teardown.push(() => document.removeEventListener('visibilitychange', onVis));
+    this.teardown.push(
+      subscribeKeys(['reducedMotion'], () => {
+        this.controls.autoRotate = !getState().reducedMotion && this.controls.autoRotate;
+      }),
+    );
 
     this.syncRunning();
+  }
+
+  /**
+   * Tear the scene down completely.
+   *
+   * Materials capture their colour when they are constructed, so a theme
+   * switch cannot repaint the diorama in place — it is disposed and
+   * rebuilt. That makes GPU cleanup load-bearing rather than politeness:
+   * browsers cap live WebGL contexts (~16), so leaking one per toggle
+   * would kill the view after a dozen switches.
+   */
+  dispose(): void {
+    this.running = false;
+    cancelAnimationFrame(this.animId);
+    for (const off of this.teardown) off();
+    this.teardown = [];
+    this.updaters = [];
+
+    this.scene.traverse((obj) => {
+      const mesh = obj as THREE.Mesh;
+      mesh.geometry?.dispose?.();
+      const mat = mesh.material as THREE.Material | THREE.Material[] | undefined;
+      for (const m of Array.isArray(mat) ? mat : mat ? [mat] : []) {
+        for (const v of Object.values(m)) {
+          if (v instanceof THREE.Texture) v.dispose();
+        }
+        m.dispose();
+      }
+    });
+    this.scene.clear();
+
+    this.controls.dispose();
+    this.renderer.dispose();
+    this.renderer.domElement.remove();
   }
 
   /** Register a per-frame updater (lens animation, warden, etc). */

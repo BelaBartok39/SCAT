@@ -48,6 +48,72 @@
   --obj-lpe: #5b3fa8;
   --obj-aj:  #c0392b;
   --obj-tfs: #b8860b;
+
+  /* — Semantic surfaces, named so the light theme has something to flip.
+       Previously these were hardcoded at each use site. — */
+  --scrim:          rgba(4, 4, 10, 0.72);     /* modal backdrop */
+  --bg-panel:       rgba(12, 12, 26, 0.97);   /* modal / warden panel */
+  --bg-panel-soft:  rgba(10, 10, 22, 0.88);
+  --bg-sunken:      rgba(15, 15, 30, 0.6);    /* inset rows, list items */
+  --bg-sunken-hi:   rgba(30, 30, 55, 0.85);   /* hovered list item */
+  --bg-header:      rgba(7, 7, 15, 0.7);
+  --bg-plot:        rgba(4, 4, 10, 0.8);      /* canvas surround in lab */
+  --on-accent:      #fff;                     /* text on a saturated fill */
+  --on-amber:       #1a1206;                  /* text on an amber fill */
+  --accent-violet:  #818cf8;
+  --maturity-w-bg:  rgba(107, 114, 128, 0.4);
+  --maturity-w-badge: #4b5563;
+  --grid-line:      rgba(99, 102, 241, 0.14);
+  --warden-tint:    244, 63, 94;              /* rgb triplet, alpha at use */
+  --glow-opacity:   0.14;
+}
+
+/* ====================================================================
+   LIGHT THEME
+   Palette lifted from the four-view storyboard (docs/storyboard.html)
+   so the two read as the same product: pale ground, near-black ink,
+   neutral grey hairlines, and desaturated accents that stay legible
+   against white. Dark stays the default; this applies only when the
+   user opts in via the header toggle.
+   ==================================================================== */
+:root[data-theme="light"] {
+  --bg-deep:        #f4f5f8;
+  --bg-card:        rgba(255, 255, 255, 0.86);
+  --bg-card-hover:  #ffffff;
+  --border-subtle:  rgba(20, 26, 48, 0.12);
+  --border-accent:  rgba(14, 116, 144, 0.38);
+  --border-bright:  #0e7490;
+  --text-primary:   #12141c;
+  --text-secondary: #414859;
+  --text-muted:     #6b7383;
+  --text-label:     #8b93a3;
+  --accent-indigo:  #4f46e5;
+  --accent-cyan:    #0e7490;
+  --accent-pink:    #be123c;
+  --accent-green:   #047857;
+  --accent-amber:   #b45309;
+  --shadow-glow:    0 1px 2px rgba(16, 22, 44, 0.06),
+                    0 8px 24px rgba(16, 22, 44, 0.05);
+
+  /* Maturity: N/E/R are dark enough to carry white text on a pale
+     ground, so they survive unchanged. W was a near-white chip that
+     would vanish here, so it gains a border-weight grey instead. */
+  --maturity-w:       #e3e5eb;
+  --maturity-w-text:  #4b5563;
+  --maturity-w-bg:    rgba(20, 26, 48, 0.16);
+  --maturity-w-badge: #8b93a3;
+
+  --scrim:          rgba(20, 26, 48, 0.38);
+  --bg-panel:       #ffffff;
+  --bg-panel-soft:  rgba(255, 255, 255, 0.94);
+  --bg-sunken:      #e9ecf2;
+  --bg-sunken-hi:   #dde2ea;
+  --bg-header:      rgba(255, 255, 255, 0.78);
+  --bg-plot:        #ffffff;
+  --accent-violet:  #5b3fa8;
+  --grid-line:      rgba(20, 26, 48, 0.10);
+  --warden-tint:    190, 18, 60;
+  --glow-opacity:   0.05;
 }
 
 html, body {
@@ -64,13 +130,13 @@ html, body {
   position: fixed;
   border-radius: 50%;
   filter: blur(120px);
-  opacity: 0.14;
+  opacity: var(--glow-opacity);
   pointer-events: none;
   z-index: 0;
 }
 .bg-glow-1 { width: 500px; height: 500px; background: var(--accent-indigo); top: -150px; left: -100px; }
 .bg-glow-2 { width: 400px; height: 400px; background: var(--accent-cyan); bottom: -120px; right: -80px; }
-.bg-glow-3 { width: 300px; height: 300px; background: var(--accent-pink); top: 40%; left: 60%; opacity: 0.07; }
+.bg-glow-3 { width: 300px; height: 300px; background: var(--accent-pink); top: 40%; left: 60%; opacity: calc(var(--glow-opacity) * 0.5); }
 
 /* ——— Screen show/hide (ported pattern) ——— */
 .screen {
